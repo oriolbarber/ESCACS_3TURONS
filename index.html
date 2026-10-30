@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Escacs 3 Turons</title>
+<meta name="theme-color" content="#1F3F73">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231F3F73'/%3E%3Ctext x='50' y='72' font-size='64' text-anchor='middle' fill='white'%3E%E2%99%9E%3C/text%3E%3C/svg%3E">
+<style>
+/* ============ 1. TEMES I VARIABLES ============ */
+:root{
+  --navy:#1F3F73; --coral:#E74C3C; --gold:#F1C40F; --turq:#1ABC9C; --sky:#3498DB;
+  --bg:#EEF2F8; --card:#FFFFFF; --ink:#13213A; --muted:#5A6A84; --line:#D6DFEB; --soft:#F5F8FC;
+  --win:#1ABC9C; --loss:#E74C3C; --draw:#E0B000; --sel-ink:#fff;
+  --silver:#AEB8C8; --bronze:#C9824A;
+  --fs:17px; --r:14px;
+}
+:root[data-cb="1"]{ --win:#2E86DE; --loss:#E67E22; --draw:#8E8E8E; --turq:#2E86DE; --coral:#E67E22; }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#0C1628; --card:#15233C; --ink:#EAF1FB; --muted:#9FB2CE; --line:#273A5A; --soft:#1B2B47; }
+}
+:root[data-theme="dark"]{ --bg:#0C1628; --card:#15233C; --ink:#EAF1FB; --muted:#9FB2CE; --line:#273A5A; --soft:#1B2B47; }
+:root[data-big="1"]{ --fs:20px; }
+
+/* ============ 2. BASE ============ */
+*{box-sizing:border-box}
+html{font-size:var(--fs);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,Helvetica,sans-serif;line-height:1.35;min-height:100vh}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+.tt{text-transform:uppercase;letter-spacing:.02em}
+.muted{color:var(--muted)}
+.wrap{max-width:1150px;margin:0 auto;padding:0 16px}
+.hidden{display:none!important}
+
+/* ============ 3. CAPÇALERA ============ */
+header.top{background:var(--navy);color:#fff;position:relative;overflow:hidden}
+header.top .wrap{display:flex;align-items:center;gap:14px;min-height:92px;position:relative;z-index:2}
+.brand{display:flex;align-items:center;gap:14px;flex:1;min-width:0}
+.brand img{height:54px;width:auto}
+.brand .knight{font-size:3rem;line-height:1}
+.brand h1{margin:0;font-size:1.9rem;font-weight:800;letter-spacing:.06em}
+.brand small{display:block;font-size:.72rem;color:#CFE0EE;letter-spacing:.08em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.diamonds{position:absolute;right:max(110px,calc((100vw - 1150px)/2 + 90px));top:50%;height:0;z-index:1;pointer-events:none}
+.diamonds i{position:absolute;width:64px;height:64px;transform:rotate(45deg);opacity:.9;top:-32px}
+.diamonds i:nth-child(1){background:var(--coral);right:0}
+.diamonds i:nth-child(2){background:var(--gold);right:44px;top:-10px}
+.diamonds i:nth-child(3){background:var(--turq);right:88px;top:-40px}
+.diamonds i:nth-child(4){background:var(--sky);right:132px;top:-6px}
+.iconbtn{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:1.7rem;color:#fff;background:rgba(255,255,255,.12)}
+.iconbtn:active{background:rgba(255,255,255,.25)}
+nav.tabs{background:var(--navy);border-top:1px solid rgba(255,255,255,.12)}
+nav.tabs .wrap{display:flex;gap:4px}
+nav.tabs button{color:#CFE0EE;padding:14px 18px;font-weight:700;letter-spacing:.06em;border-bottom:4px solid transparent;min-height:52px}
+nav.tabs button.on{color:#fff;border-color:var(--gold)}
+@media (max-width:620px){
+  .diamonds{display:none}
+  .brand h1{font-size:1.45rem}
+  .brand .knight{font-size:2.3rem}
+}
+
+/* ============ 4. COMPONENTS ============ */
+main{padding:20px 0 90px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.spread{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+h2.sec{font-size:1.35rem;margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.btn{min-height:50px;padding:0 20px;border-radius:12px;font-weight:700;background:var(--soft);border:1px solid var(--line);display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.pri{background:var(--navy);color:#fff;border-color:var(--navy)}
+:root[data-theme="dark"] .btn.pri{background:var(--sky);border-color:var(--sky)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.pri{background:var(--sky);border-color:var(--sky)}}
+.btn.ok{background:var(--turq);color:#fff;border-color:var(--turq)}
+.btn.warn{background:var(--coral);color:#fff;border-color:var(--coral)}
+.btn.sm{min-height:42px;padding:0 14px;font-size:.9rem}
+.btn:disabled{opacity:.45;cursor:default}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:99px;font-size:.8rem;font-weight:700;background:var(--soft);border:1px solid var(--line)}
+.chip.ins{background:color-mix(in srgb,var(--sky) 18%,transparent);border-color:var(--sky)}
+.chip.joc{background:color-mix(in srgb,var(--gold) 25%,transparent);border-color:var(--gold)}
+.chip.fi{background:color-mix(in srgb,var(--turq) 18%,transparent);border-color:var(--turq)}
+.dia{width:22px;height:22px;transform:rotate(45deg);border-radius:3px;flex:none;display:inline-grid;place-items:center}
+.dia b{transform:rotate(-45deg);color:#fff;font-size:.72rem}
+input[type=text],input[type=number],input[type=search],select,textarea{width:100%;min-height:50px;padding:10px 14px;border-radius:12px;border:1px solid var(--line);background:var(--soft)}
+textarea{min-height:130px;resize:vertical}
+label.f{display:block;font-weight:700;margin:12px 0 6px;font-size:.92rem}
+.seg{display:inline-flex;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px;flex-wrap:wrap}
+.seg button{min-height:42px;padding:0 14px;border-radius:9px;font-weight:700;font-size:.9rem}
+.seg button.on{background:var(--navy);color:#fff}
+.empty{text-align:center;padding:34px 16px;color:var(--muted)}
+.empty .big{font-size:3rem}
+
+/* Targetes de torneig */
+.tcard{cursor:pointer;display:flex;flex-direction:column;gap:10px;border-left:6px solid var(--sky);transition:transform .1s}
+.tcard:active{transform:scale(.99)}
+.tcard.joc{border-left-color:var(--gold)}
+.tcard.fi{border-left-color:var(--turq)}
+.tcard h3{margin:0;font-size:1.12rem}
+.tcard .meta{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:.9rem}
+.bar{height:8px;border-radius:9px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--gold)}
+details.more summary{cursor:pointer;font-weight:700;padding:14px 0;color:var(--muted);list-style:none}
+details.more summary::before{content:"▸ "}
+details.more[open] summary::before{content:"▾ "}
+
+/* Torneig */
+.thead{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
+.back{min-height:46px;padding:0 12px 0 6px;border-radius:10px;font-weight:700;color:var(--muted)}
+.thead h2{margin:0;font-size:1.5rem;flex:1;min-width:200px}
+.subtabs{display:flex;gap:6px;border-bottom:2px solid var(--line);margin:6px 0 16px;overflow-x:auto}
+.subtabs button{padding:12px 16px;font-weight:700;color:var(--muted);border-bottom:4px solid transparent;margin-bottom:-2px;white-space:nowrap;min-height:50px}
+.subtabs button.on{color:var(--ink);border-color:var(--coral)}
+
+/* Rondes i partides */
+.rounds{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px}
+.rounds button{min-width:52px;height:52px;border-radius:12px;font-weight:800;background:var(--card);border:2px solid var(--line);flex:none}
+.rounds button.done{border-color:var(--turq)}
+.rounds button.done::after{content:" ✓";font-size:.75rem}
+.rounds button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.games{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.game{display:flex;flex-direction:column;gap:12px}
+.game .tbl{font-size:.75rem;font-weight:800;color:var(--muted);letter-spacing:.08em}
+.pl{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
+.pl .pc{font-size:1.6rem;line-height:1;width:28px;text-align:center}
+.pl .nm{font-weight:700;font-size:1.05rem;overflow:hidden;text-overflow:ellipsis}
+.pl .nm small{display:block;font-weight:400;color:var(--muted);font-size:.78rem}
+.pl .mk{font-weight:800;font-size:.9rem;min-width:26px;text-align:right}
+.pl.w .nm{color:var(--win)} .pl.l .nm{opacity:.6}
+.res{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.res button{min-height:52px;border-radius:12px;font-weight:800;font-size:1.05rem;background:var(--soft);border:2px solid var(--line)}
+.res button.on.v1{background:var(--win);border-color:var(--win);color:#fff}
+.res button.on.vd{background:var(--draw);border-color:var(--draw);color:#fff}
+.res button.on.v0{background:var(--win);border-color:var(--win);color:#fff}
+.res button:disabled{cursor:default}
+.bye{display:flex;align-items:center;gap:12px;border-style:dashed}
+
+/* Classificació */
+.podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-items:end;max-width:640px;margin:0 auto 20px}
+.pod{text-align:center}
+.pod .nm{font-weight:800;margin-bottom:8px;font-size:1rem;overflow-wrap:anywhere}
+.pod .pts{font-size:.85rem;color:var(--muted);margin-bottom:6px}
+.pod .blk{border-radius:12px 12px 0 0;color:#fff;font-size:2.2rem;font-weight:800;display:grid;place-items:center}
+.pod.p1 .blk{background:var(--gold);height:130px;color:#5a4500}
+.pod.p2 .blk{background:var(--silver);height:96px}
+.pod.p3 .blk{background:var(--bronze);height:72px}
+table.st{width:100%;border-collapse:collapse}
+table.st th{text-align:left;font-size:.75rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;padding:8px 8px;border-bottom:2px solid var(--line)}
+table.st td{padding:12px 8px;border-bottom:1px solid var(--line)}
+table.st td.n{text-align:right;font-variant-numeric:tabular-nums}
+table.st td.pts{font-size:1.25rem;font-weight:800}
+table.st tr.out td{opacity:.5}
+.pos{font-weight:800;font-size:1.1rem;width:44px}
+
+/* Persones */
+.plist{display:flex;flex-direction:column;gap:6px}
+.prow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;background:var(--card);border:1px solid var(--line);min-height:58px}
+.prow .nm{flex:1;min-width:0;font-weight:700}
+.prow .nm small{display:block;font-weight:400;color:var(--muted);font-size:.8rem}
+.badge{font-size:.72rem;font-weight:800;padding:3px 9px;border-radius:99px;letter-spacing:.05em;color:#fff;flex:none}
+.badge.prof{background:var(--navy)} .badge.alum{background:var(--coral)}
+:root[data-theme="dark"] .badge.prof{background:var(--sky)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .badge.prof{background:var(--sky)}}
+.addbtn{width:48px;height:48px;border-radius:12px;font-size:1.5rem;font-weight:800;background:var(--turq);color:#fff;flex:none}
+.rmbtn{width:48px;height:48px;border-radius:12px;font-size:1.3rem;background:var(--soft);border:1px solid var(--line);flex:none}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:820px){.cols{grid-template-columns:1fr}}
+
+/* ============ 5. MODALS, MENÚ, TOAST ============ */
+.scrim{position:fixed;inset:0;background:rgba(5,12,25,.55);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+@media (min-width:700px){.scrim{align-items:center}}
+.modal{background:var(--card);width:100%;max-width:560px;max-height:92vh;overflow:auto;border-radius:20px 20px 0 0;padding:20px 18px 26px}
+@media (min-width:700px){.modal{border-radius:20px}}
+.modal h3{margin:0 0 6px;font-size:1.25rem}
+.modal .acts{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap}
+.sheet{position:fixed;inset:0;z-index:60;background:var(--bg);overflow:hidden}
+.page{position:absolute;inset:0;background:var(--bg);overflow:auto;transition:transform .25s ease}
+.page.in{transform:translateX(100%)}
+.pbar{position:sticky;top:0;background:var(--navy);color:#fff;display:grid;grid-template-columns:56px 1fr 56px;align-items:center;min-height:64px;z-index:2}
+.pbar h3{margin:0;text-align:center;font-size:1.1rem}
+.pbar button{color:#fff;font-size:1.8rem;height:56px}
+.mitem{display:flex;align-items:center;gap:14px;padding:18px 18px;border-bottom:1px solid var(--line);background:var(--card);width:100%;text-align:left;font-weight:700;min-height:64px}
+.mitem small{display:block;font-weight:400;color:var(--muted)}
+.mitem .dia{width:18px;height:18px}
+.mitem::after{content:"›";margin-left:auto;font-size:1.6rem;color:var(--muted)}
+.pbody{padding:18px 16px;max-width:700px;margin:0 auto}
+.pbody p{margin:.4em 0 1em}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(200%);visibility:hidden;background:var(--navy);color:#fff;padding:14px 22px;border-radius:14px;font-weight:700;z-index:90;transition:transform .25s;max-width:92vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.toast.on{transform:translateX(-50%) translateY(0);visibility:visible}
+
+/* Lliscador de confirmació */
+.slide{position:relative;height:60px;border-radius:99px;background:color-mix(in srgb,var(--coral) 16%,var(--soft));border:2px solid var(--coral);margin-top:18px;user-select:none;touch-action:none;overflow:hidden}
+.slide span{position:absolute;inset:0;display:grid;place-items:center;font-weight:800;color:var(--coral);letter-spacing:.04em;padding-left:50px}
+.slide .knob{position:absolute;left:4px;top:4px;width:48px;height:48px;border-radius:50%;background:var(--coral);color:#fff;display:grid;place-items:center;font-size:1.4rem;cursor:grab;touch-action:none}
+
+/* ============ 6. PROJECCIÓ I INSCRIPCIÓ ============ */
+.fs{position:fixed;inset:0;z-index:80;background:var(--navy);color:#fff;overflow:auto;padding:24px 4vw}
+.fs h2{font-size:clamp(1.6rem,4vw,3rem);margin:0}
+.fs .fsbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:24px}
+.fs .fsbar .btn{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.25);color:#fff}
+.fs .fsbar .btn.on{background:var(--gold);color:#3b2d00;border-color:var(--gold)}
+.fsg{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(520px,100%),1fr));gap:14px}
+.fsgame{background:rgba(255,255,255,.08);border-radius:16px;padding:16px 20px;display:grid;grid-template-columns:auto 1fr auto 1fr;gap:14px;align-items:center;font-size:clamp(1.1rem,2.2vw,1.7rem);font-weight:700}
+.fsgame .t{background:var(--gold);color:#3b2d00;border-radius:10px;padding:4px 12px;font-size:.8em}
+.fsgame .vs{color:var(--gold);font-size:.85em}
+.fs table.st td,.fs table.st th{border-color:rgba(255,255,255,.18);color:#fff;font-size:clamp(1rem,2vw,1.6rem)}
+.kiosk{max-width:620px;margin:6vh auto 0;text-align:center}
+.kiosk input{font-size:1.4rem;min-height:64px;text-align:center;background:#fff;color:#13213A}
+.kiosk .btn{min-height:66px;font-size:1.3rem;width:100%;margin-top:14px}
+.kiosk .okmsg{font-size:1.6rem;font-weight:800;color:var(--gold);min-height:2.2em;margin-top:18px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <!-- Si poses logo.png (versió blanca) al repositori, apareix aquí automàticament -->
+      <img src="logo.png" alt="Institut Els 3 Turons" onerror="this.remove();document.getElementById('kn').classList.remove('hidden')">
+      <span id="kn" class="knight hidden">♞</span>
+      <div style="min-width:0">
+        <h1 class="tt">Escacs</h1>
+        <small class="tt">Institut Els 3 Turons · Arenys de Mar</small>
+      </div>
+    </div>
+    <button class="iconbtn" data-act="menu" aria-label="Menú">⋮</button>
+  </div>
+  <div class="diamonds"><i></i><i></i><i></i><i></i></div>
+</header>
+<nav class="tabs"><div class="wrap">
+  <button class="tt" data-act="go" data-v="home" id="tab-home">Tornejos</button>
+  <button class="tt" data-act="go" data-v="people" id="tab-people">Persones</button>
+</div></nav>
+
+<main><div class="wrap" id="app"></div></main>
+<div class="toast" id="toast"></div>
+<div id="layer"></div>
+
+<script>
+/* =========================================================
+   ESCACS 3 TURONS — gestor de tornejos (un sol fitxer)
+   Dades: localStorage + exportar/importar JSON + dades.json publicat
+   ========================================================= */
+
+/* ---------- 1. DADES INICIALS ---------- */
+const KEY = 'escacs3t_v1';
+const PROFESSORAT = ['David Filgaira','Roc Biosca','Manel Jimenez','Oriol Barber','Oriol Berengueres',
+  'Alicia Martin','Victor Aguilar','Tomas Martinez','Brian David Saimur','Alberto Bernabeu'];
+
+function seed(){
+  const players = PROFESSORAT.map(n => ({id:uid(), name:n, type:'prof', group:'Professorat'}));
+  return {
+    v:1, players,
+    tournaments:[{
+      id:uid(), name:'Torneig del professorat 2026-27', format:'lliga', nRounds:0,
+      status:'inscripcio', playerIds:players.map(p=>p.id), out:[], rounds:[], date:today()
+    }],
+    prefs:{theme:'auto', cb:false, big:false}
+  };
+}
+
+/* ---------- 2. UTILITATS ---------- */
+function uid(){ return Math.random().toString(36).slice(2,10); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function fmt(n){ return Number.isInteger(n) ? String(n) : (Math.floor(n)||'') + '½'; }
+function norm(s){ return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+const $ = s => document.querySelector(s);
+
+let S = null;
+const ui = { view:'home', tid:null, sub:null, round:0, q:'', filt:'tots', pq:'', pfilt:'tots' };
+
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ toast('⚠️ No s\'ha pogut desar al navegador'); } }
+function load(){ try{ const j = localStorage.getItem(KEY); return j ? JSON.parse(j) : null; }catch(e){ return null; } }
+function P(id){ return S.players.find(p=>p.id===id) || {id, name:'(persona esborrada)', type:'alum', group:''}; }
+function T(id){ return S.tournaments.find(t=>t.id===id); }
+function sanitize(d){
+  if(!d || !Array.isArray(d.players) || !Array.isArray(d.tournaments)) throw new Error('Format no vàlid');
+  d.prefs = Object.assign({theme:'auto',cb:false,big:false}, d.prefs||{});
+  d.tournaments.forEach(t=>{ t.out=t.out||[]; t.rounds=t.rounds||[]; t.playerIds=t.playerIds||[]; });
+  return d;
+}
+
+let toastT;
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),2400); }
+
+function applyPrefs(){
+  const r=document.documentElement, p=S.prefs;
+  if(p.theme==='auto') r.removeAttribute('data-theme'); else r.dataset.theme=p.theme;
+  r.dataset.cb = p.cb ? '1':'0'; r.dataset.big = p.big ? '1':'0';
+}
+
+/* ---------- 3. PUNTUACIÓ I DESEMPATS ---------- */
+const BYE_PTS = t => t.format==='suis' ? 1 : 0;   // suís: descans = 1 punt; lliga: 0 (tothom en té un)
+
+function standings(t){
+  const ids = [...new Set([...t.playerIds, ...t.rounds.flat().flatMap(g=>[g.w,g.b]).filter(Boolean)])];
+  const R = {}; ids.forEach(id=>R[id]={id, pts:0, wins:0, played:0, games:[]});
+  t.rounds.forEach(r=>r.forEach(g=>{
+    if(g.b==null){ if(g.res==='bye' && R[g.w]) R[g.w].pts += BYE_PTS(t); return; }
+    if(!g.res) return;
+    const [a,b] = g.res==='1-0'?[1,0]:g.res==='0-1'?[0,1]:[.5,.5];
+    R[g.w].pts+=a; R[g.b].pts+=b; R[g.w].played++; R[g.b].played++;
+    if(a===1)R[g.w].wins++; if(b===1)R[g.b].wins++;
+    R[g.w].games.push([g.b,a]); R[g.b].games.push([g.w,b]);
+  }));
+  Object.values(R).forEach(x=>{
+    x.buch = x.games.reduce((s,[o])=>s+R[o].pts,0);
+    x.sb   = x.games.reduce((s,[o,sc])=>s+sc*R[o].pts,0);
+    x.tb   = t.format==='suis' ? x.buch : x.sb;
+  });
+  return Object.values(R).sort((a,b)=> b.pts-a.pts || b.tb-a.tb || b.wins-a.wins || P(a.id).name.localeCompare(P(b.id).name));
+}
+
+/* ---------- 4. APARELLAMENTS ---------- */
+// Lliga (tothom contra tothom): mètode del cercle, totes les rondes de cop
+function roundRobin(ids){
+  let a = shuffle(ids.slice()); if(a.length%2) a.push(null);
+  const n=a.length, rounds=[];
+  for(let r=0;r<n-1;r++){
+    const games=[], byes=[];
+    for(let i=0;i<n/2;i++){
+      let x=a[i], y=a[n-1-i];
+      if((r+i)%2) [x,y]=[y,x];
+      if(x==null || y==null) byes.push({w:x??y, b:null, res:'bye'});
+      else games.push({w:x, b:y, res:null});
+    }
+    rounds.push(games.concat(byes));
+    a = [a[0], a[n-1], ...a.slice(1,n-1)];
+  }
+  return rounds;
+}
+
+// Suís: aparella per punts evitant repetir rivals
+function swissRound(t){
+  const st = standings(t).filter(x=>t.playerIds.includes(x.id) && !t.out.includes(x.id));
+  let list = st.map(x=>x.id);
+  if(t.rounds.length===0) shuffle(list);
+  const played = new Set(), hadBye = new Set(), whites={}, last={};
+  t.rounds.forEach(r=>r.forEach(g=>{
+    if(g.b==null){ hadBye.add(g.w); return; }
+    played.add(g.w+'|'+g.b); played.add(g.b+'|'+g.w);
+    whites[g.w]=(whites[g.w]||0)+1; last[g.w]='w'; last[g.b]='b';
+  }));
+  let bye=null;
+  if(list.length%2){
+    for(let i=list.length-1;i>=0;i--) if(!hadBye.has(list[i])){ bye=list[i]; break; }
+    if(bye==null) bye=list[list.length-1];
+    list = list.filter(x=>x!==bye);
+  }
+  let steps=0;
+  const rec = (arr, allowRe) => {
+    if(!arr.length) return [];
+    if(++steps>40000) return null;
+    const a=arr[0];
+    for(let j=1;j<arr.length;j++){
+      const b=arr[j];
+      if(!allowRe && played.has(a+'|'+b)) continue;
+      const r = rec(arr.filter((_,k)=>k!==0&&k!==j), allowRe);
+      if(r) return [[a,b],...r];
+    }
+    return null;
+  };
+  let pairs = rec(list,false); if(!pairs){ steps=0; pairs = rec(list,true); }
+  const games = pairs.map(([a,b])=>{
+    const wa=whites[a]||0, wb=whites[b]||0;
+    let swap = wa>wb || (wa===wb && last[a]==='w' && last[b]!=='w');
+    return swap ? {w:b,b:a,res:null} : {w:a,b:b,res:null};
+  });
+  if(bye) games.push({w:bye,b:null,res:'bye'});
+  return games;
+}
+function suggestRounds(n){ return Math.max(3, Math.min(9, Math.ceil(Math.log2(Math.max(2,n)))+2)); }
+function roundDone(r){ return r.every(g=>g.b==null || g.res); }
+function totalRounds(t){ return t.format==='lliga' ? t.rounds.length : t.nRounds; }
+
+/* ---------- 5. RENDER PRINCIPAL ---------- */
+function render(){
+  $('#tab-home').classList.toggle('on', ui.view!=='people');
+  $('#tab-people').classList.toggle('on', ui.view==='people');
+  const app=$('#app');
+  if(ui.view==='tour' && T(ui.tid)) app.innerHTML = vTour(T(ui.tid));
+  else if(ui.view==='people') { app.innerHTML = vPeople(); fillPeople(); }
+  else { ui.view='home'; app.innerHTML = vHome(); }
+  if(ui.view==='tour' && ui.sub==='jug') fillPicker();
+}
+
+function statusChip(t){
+  if(t.status==='inscripcio') return `<span class="chip ins">✎ Inscripció oberta</span>`;
+  if(t.status==='enjoc'){ const cur = t.rounds.findIndex(r=>!roundDone(r)); const n = cur<0 ? t.rounds.length : cur+1;
+    return `<span class="chip joc">▶ En joc · Ronda ${n}/${totalRounds(t)}</span>`; }
+  return `<span class="chip fi">✓ Acabat</span>`;
+}
+
+/* --- Inici: llista de tornejos --- */
+function vHome(){
+  const act = S.tournaments.filter(t=>t.status!=='acabat');
+  const fin = S.tournaments.filter(t=>t.status==='acabat');
+  const card = t => {
+    const tot = t.rounds.flat().filter(g=>g.b!=null).length, done = t.rounds.flat().filter(g=>g.b!=null&&g.res).length;
+    const lead = t.status!=='inscripcio' ? standings(t)[0] : null;
+    const cls = t.status==='enjoc'?'joc':t.status==='acabat'?'fi':'';
+    return `<div class="card tcard ${cls}" data-act="open" data-id="${t.id}">
+      <div class="spread"><h3 class="tt">${esc(t.name)}</h3></div>
+      <div class="row">${statusChip(t)}<span class="chip">${t.format==='lliga'?'Lliga':'Suís'}</span></div>
+      <div class="meta"><span>♟ ${t.playerIds.length} jugadors</span>${lead&&done?`<span>${t.status==='acabat'?'🏆':'⬆'} ${esc(P(lead.id).name)} · ${fmt(lead.pts)} pts</span>`:''}</div>
+      ${t.status==='enjoc'?`<div class="bar"><i style="width:${tot?Math.round(done/tot*100):0}%"></i></div>`:''}
+    </div>`;
+  };
+  return `
+  <div class="spread" style="margin-bottom:16px">
+    <h2 class="sec tt">Tornejos</h2>
+    <button class="btn pri" data-act="newT">＋ Nou torneig</button>
+  </div>
+  ${act.length ? `<div class="grid">${act.map(card).join('')}</div>`
+    : `<div class="card empty"><div class="big">♜</div><p>No hi ha cap torneig en marxa.</p><button class="btn pri" data-act="newT">＋ Crear-ne un</button></div>`}
+  ${fin.length ? `<details class="more"><summary>Acabats (${fin.length})</summary><div class="grid">${fin.map(card).join('')}</div></details>`:''}`;
+}
+
+/* --- Vista d'un torneig --- */
+function vTour(t){
+  if(!ui.sub) ui.sub = t.status==='inscripcio' ? 'jug' : 'ron';
+  const sub = ui.sub;
+  let actions='';
+  if(t.status==='inscripcio') actions = `<button class="btn ok" data-act="start" ${t.playerIds.length<2?'disabled':''}>▶ Començar</button>`;
+  else if(t.status==='enjoc'){
+    const allDone = t.rounds.length && t.rounds.every(roundDone) && t.rounds.length>=totalRounds(t);
+    if(allDone) actions = `<button class="btn ok" data-act="finish">🏆 Tancar torneig</button>`;
+  } else actions = `<button class="btn sm" data-act="reopen">Reobrir</button>`;
+  const tabs = [['ron','Rondes'],['cla','Classificació'],['jug','Jugadors ('+t.playerIds.length+')']];
+  return `
+  <div class="thead">
+    <button class="back" data-act="go" data-v="home">‹ Tornejos</button>
+  </div>
+  <div class="spread" style="margin-bottom:8px">
+    <h2 class="sec tt" style="font-size:1.5rem">${esc(t.name)}</h2>
+    <div class="row">
+      ${t.status!=='inscripcio'?`<button class="btn sm" data-act="project">⛶ Projectar</button>`:''}
+      <button class="btn sm" data-act="editT">✎ Editar</button>
+      ${actions}
+    </div>
+  </div>
+  <div class="row" style="margin-bottom:6px">${statusChip(t)}<span class="chip">${t.format==='lliga'?'Lliga · tothom contra tothom':'Suís · '+t.nRounds+' rondes'}</span></div>
+  <div class="subtabs">${tabs.map(([k,l])=>`<button class="tt ${sub===k?'on':''}" data-act="sub" data-v="${k}">${l}</button>`).join('')}</div>
+  ${sub==='ron'?vRounds(t):sub==='cla'?vStand(t):vEnrol(t)}`;
+}
+
+function vRounds(t){
+  if(t.status==='inscripcio') return `<div class="card empty"><div class="big">♟</div><p>Quan la llista de jugadors estigui a punt, prem <b>Començar</b> i es generaran els aparellaments.</p></div>`;
+  if(ui.round>=t.rounds.length) ui.round = Math.max(0, t.rounds.length-1);
+  const ri = ui.round, r = t.rounds[ri], lock = t.status==='acabat';
+  const chips = t.rounds.map((x,i)=>`<button class="${i===ri?'on':''} ${roundDone(x)?'done':''}" data-act="round" data-v="${i}">${i+1}</button>`).join('')
+    + (t.format==='suis' ? Array.from({length:Math.max(0,t.nRounds-t.rounds.length)},(_,i)=>`<button disabled style="opacity:.35">${t.rounds.length+i+1}</button>`).join('') : '');
+  const real = r.filter(g=>g.b!=null), done = real.filter(g=>g.res).length;
+  let n=0;
+  const games = r.map((g,gi)=>{
+    if(g.b==null) return `<div class="card bye"><span class="dia" style="background:var(--sky)"><b>–</b></span><div><b>${esc(P(g.w).name)}</b><div class="muted" style="font-size:.88rem">Descansa aquesta ronda ${BYE_PTS(t)?'(+1 punt)':'(0 punts)'}</div></div></div>`;
+    n++;
+    const wW = g.res==='1-0', bW = g.res==='0-1', dr = g.res==='½-½';
+    const pl = (id,pc,win,lose,mk) => `<div class="pl ${win?'w':''} ${lose?'l':''}"><span class="pc">${pc}</span><span class="nm">${esc(P(id).name)}<small>${esc(P(id).group||'')}</small></span><span class="mk">${mk}</span></div>`;
+    const b = (v,lab,cls) => `<button class="${cls} ${g.res===v?'on':''}" data-act="res" data-g="${gi}" data-v="${v}" ${lock?'disabled':''} aria-label="Resultat ${lab}">${lab}</button>`;
+    return `<div class="card game">
+      <div class="tbl tt">Taula ${n}</div>
+      ${pl(g.w,'♔',wW,bW, wW?'✓ 1':bW?'0':dr?'½':'')}
+      ${pl(g.b,'♚',bW,wW, bW?'✓ 1':wW?'0':dr?'½':'')}
+      <div class="res">${b('1-0','1 – 0','v1')}${b('½-½','½ – ½','vd')}${b('0-1','0 – 1','v0')}</div>
+    </div>`;
+  }).join('');
+  let next='';
+  if(t.status==='enjoc' && t.format==='suis' && roundDone(r) && ri===t.rounds.length-1 && t.rounds.length<t.nRounds)
+    next = `<div class="card" style="margin-top:14px;text-align:center"><p style="margin-top:0">Ronda ${ri+1} completa.</p><button class="btn pri" data-act="nextRound">Generar ronda ${ri+2}</button></div>`;
+  return `<div class="rounds">${chips}</div>
+    <div class="spread" style="margin-bottom:10px"><b class="tt">Ronda ${ri+1}</b><span class="muted">${done}/${real.length} resultats</span></div>
+    <div class="games">${games}</div>${next}`;
+}
+
+function vStand(t){
+  if(t.status==='inscripcio') return `<div class="card empty"><div class="big">🏆</div><p>La classificació apareixerà quan comenci el torneig.</p></div>`;
+  const st = standings(t), lock = st.some(x=>x.played||x.pts);
+  const tbN = t.format==='suis' ? 'Buchholz' : 'Sonneborn';
+  const pod = lock && st.length>=3 ? `<div class="podium">${[1,0,2].map(i=>`<div class="pod p${i+1}"><div class="nm">${esc(P(st[i].id).name)}</div><div class="pts">${fmt(st[i].pts)} pts</div><div class="blk">${i+1}</div></div>`).join('')}</div>` : '';
+  return `${pod}<div class="card" style="padding:6px 10px;overflow-x:auto"><table class="st">
+    <thead><tr><th>#</th><th>Jugador/a</th><th style="text-align:right">Punts</th><th style="text-align:right">${tbN}</th><th style="text-align:right">PJ</th></tr></thead>
+    <tbody>${st.map((x,i)=>`<tr class="${t.out.includes(x.id)?'out':''}"><td class="pos">${i+1}</td>
+      <td><b>${esc(P(x.id).name)}</b>${t.out.includes(x.id)?' <span class="chip">retirat/da</span>':''}<div class="muted" style="font-size:.8rem">${esc(P(x.id).group||'')}</div></td>
+      <td class="n pts">${fmt(x.pts)}</td><td class="n">${fmt(x.tb)}</td><td class="n">${x.played}</td></tr>`).join('')}</tbody></table></div>
+    <p class="muted" style="font-size:.85rem">Desempat: 1) punts, 2) ${tbN} (${t.format==='suis'?'suma de punts dels rivals':'punts dels rivals guanyats + meitat dels empatats'}), 3) victòries.</p>`;
+}
+
+function vEnrol(t){
+  const canAdd = t.status==='inscripcio' || (t.status==='enjoc' && t.format==='suis');
+  const canRm = t.status==='inscripcio';
+  const midSwiss = t.status==='enjoc' && t.format==='suis';
+  const enrolled = t.playerIds.map(P).sort((a,b)=>a.name.localeCompare(b.name));
+  const left = `<div><div class="spread" style="margin-bottom:10px"><b class="tt">Inscrits (${enrolled.length})</b>
+      ${t.status==='inscripcio'?`<button class="btn sm" data-act="kiosk">📝 Mode inscripció</button>`:''}</div>
+    <div class="plist">${enrolled.map(p=>`<div class="prow"><span class="badge ${p.type}">${p.type==='prof'?'PROF':'ALUM'}</span>
+      <span class="nm">${esc(p.name)}<small>${esc(p.group||'')}</small></span>
+      ${canRm?`<button class="rmbtn" data-act="unenrol" data-id="${p.id}" aria-label="Treure">✕</button>`:''}
+      ${midSwiss?`<button class="btn sm" data-act="withdraw" data-id="${p.id}">${t.out.includes(p.id)?'Reincorporar':'Retirar'}</button>`:''}
+    </div>`).join('') || '<div class="empty">Encara no hi ha ningú inscrit.</div>'}</div>
+    ${t.status==='enjoc'&&t.format==='lliga'?'<p class="muted">En una lliga no es poden afegir ni treure jugadors un cop començada.</p>':''}
+    ${midSwiss?'<p class="muted">Qui s\'afegeixi ara entra a la ronda següent amb 0 punts. Qui es retira ja no s\'aparella.</p>':''}</div>`;
+  const right = canAdd ? `<div><b class="tt">Afegir</b>
+    <div class="card" style="margin-top:10px">
+      <label class="f">Alumne/a nou/va</label>
+      <div class="row"><input type="text" id="qaName" placeholder="Nom i cognom" style="flex:2;min-width:160px">
+      <input type="text" id="qaGroup" placeholder="Grup (p. ex. 1r MEF)" style="flex:1;min-width:120px">
+      <button class="btn ok" data-act="quickAdd">＋ Inscriure</button></div>
+    </div>
+    <div class="row" style="margin:14px 0 8px">
+      <input type="search" id="pq" placeholder="Cerca a la llista de persones…" value="${esc(ui.q)}" style="flex:1;min-width:180px">
+    </div>
+    <div class="spread" style="margin-bottom:8px">
+      <div class="seg">${[['tots','Tots'],['prof','Professorat'],['alum','Alumnat']].map(([k,l])=>`<button class="${ui.filt===k?'on':''}" data-act="filt" data-v="${k}">${l}</button>`).join('')}</div>
+      <button class="btn sm" data-act="enrolAll">＋ Tots els visibles</button>
+    </div>
+    <div class="plist" id="picker"></div></div>` : '';
+  return `<div class="cols">${left}${right}</div>`;
+}
+function pickerList(t){
+  return S.players.filter(p=>!t.playerIds.includes(p.id))
+    .filter(p=>ui.filt==='tots'||p.type===ui.filt)
+    .filter(p=>!ui.q || norm(p.name+' '+p.group).includes(norm(ui.q)))
+    .sort((a,b)=>a.name.localeCompare(b.name));
+}
+function fillPicker(){
+  const t=T(ui.tid), box=$('#picker'); if(!box) return;
+  const l = pickerList(t);
+  box.innerHTML = l.map(p=>`<div class="prow"><span class="badge ${p.type}">${p.type==='prof'?'PROF':'ALUM'}</span>
+    <span class="nm">${esc(p.name)}<small>${esc(p.group||'')}</small></span>
+    <button class="addbtn" data-act="enrol" data-id="${p.id}" aria-label="Inscriure">＋</button></div>`).join('')
+    || '<div class="empty" style="padding:16px">Tothom de la llista ja hi és. Afegeix alumnat nou a dalt o a <b>Persones</b>.</div>';
+}
+
+/* --- Persones --- */
+function vPeople(){
+  const np = S.players.filter(p=>p.type==='prof').length, na = S.players.length-np;
+  return `<div class="spread" style="margin-bottom:14px"><h2 class="sec tt">Persones</h2>
+    <span class="muted">${np} professorat · ${na} alumnat</span></div>
+  <div class="cols">
+    <div>
+      <div class="row" style="margin-bottom:8px"><input type="search" id="ppq" placeholder="Cerca per nom o grup…" value="${esc(ui.pq)}"></div>
+      <div class="seg" style="margin-bottom:10px">${[['tots','Tots'],['prof','Professorat'],['alum','Alumnat']].map(([k,l])=>`<button class="${ui.pfilt===k?'on':''}" data-act="pfilt" data-v="${k}">${l}</button>`).join('')}</div>
+      <div class="plist" id="plist"></div>
+    </div>
+    <div>
+      <div class="card">
+        <b class="tt">Afegir persona</b>
+        <label class="f">Nom i cognom</label><input type="text" id="npName">
+        <div class="row" style="margin-top:4px">
+          <div style="flex:1;min-width:140px"><label class="f">Tipus</label><select id="npType"><option value="alum">Alumnat</option><option value="prof">Professorat</option></select></div>
+          <div style="flex:1;min-width:140px"><label class="f">Grup</label><input type="text" id="npGroup" placeholder="p. ex. 2n MEF"></div>
+        </div>
+        <button class="btn pri" style="margin-top:14px;width:100%" data-act="addPerson">＋ Afegir</button>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <b class="tt">Afegir una llista d'alumnes</b>
+        <p class="muted" style="font-size:.9rem;margin:.4em 0 .6em">Enganxa un nom per línia. Si vols, posa el grup darrere d'un punt i coma: <i>Marta Puig; 1r MEF</i></p>
+        <textarea id="bulk" placeholder="Marta Puig; 1r MEF&#10;Jan Soler; 1r MEF&#10;Aina Vidal"></textarea>
+        <label class="f">Grup per defecte (opcional)</label><input type="text" id="bulkGroup" placeholder="p. ex. 1r MEF">
+        <button class="btn pri" style="margin-top:14px;width:100%" data-act="bulkAdd">＋ Afegir la llista</button>
+      </div>
+    </div>
+  </div>`;
+}
+function fillPeople(){
+  const box=$('#plist'); if(!box) return;
+  const l = S.players.filter(p=>ui.pfilt==='tots'||p.type===ui.pfilt)
+    .filter(p=>!ui.pq || norm(p.name+' '+p.group).includes(norm(ui.pq)))
+    .sort((a,b)=>a.type.localeCompare(b.type)||a.name.localeCompare(b.name));
+  box.innerHTML = l.map(p=>{
+    const nt = S.tournaments.filter(t=>t.playerIds.includes(p.id)).length;
+    return `<button class="prow" style="text-align:left;width:100%" data-act="editP" data-id="${p.id}"><span class="badge ${p.type}">${p.type==='prof'?'PROF':'ALUM'}</span>
+    <span class="nm">${esc(p.name)}<small>${esc(p.group||'')}${nt?` · ${nt} torneig${nt>1?'s':''}`:''}</small></span><span class="muted">✎</span></button>`;
+  }).join('') || '<div class="empty">Cap resultat.</div>';
+}
+
+/* ---------- 6. MODALS ---------- */
+function modal(html, mount){
+  const L=$('#layer'); const d=document.createElement('div'); d.className='scrim';
+  d.innerHTML = `<div class="modal" role="dialog">${html}</div>`;
+  d.addEventListener('click',e=>{ if(e.target===d) d.remove(); });
+  L.appendChild(d); mount && mount(d); return d;
+}
+function closeTop(){ const L=$('#layer'); L.lastElementChild && L.lastElementChild.remove(); }
+
+// Confirmació lliscant per a accions destructives
+function slideConfirm(title, msg, label, onOk){
+  const d = modal(`<h3 class="tt">${esc(title)}</h3><p class="muted">${msg}</p>
+    <div class="slide"><span class="tt">${esc(label)}</span><div class="knob">›</div></div>
+    <div class="acts"><button class="btn" data-x>Cancel·lar</button></div>`, d=>{
+      d.querySelector('[data-x]').onclick=()=>d.remove();
+      const tr=d.querySelector('.slide'), k=d.querySelector('.knob'); let x0=null, max=0, x=0;
+      k.addEventListener('pointerdown',e=>{ x0=e.clientX-x; max=tr.clientWidth-k.offsetWidth-8; k.setPointerCapture(e.pointerId); k.style.transition='none'; });
+      k.addEventListener('pointermove',e=>{ if(x0==null) return; x=Math.max(0,Math.min(max,e.clientX-x0)); k.style.transform=`translateX(${x}px)`; });
+      const up=()=>{ if(x0==null) return; x0=null; if(x>=max*0.92){ d.remove(); onOk(); } else { x=0; k.style.transition='transform .2s'; k.style.transform='translateX(0)'; } };
+      k.addEventListener('pointerup',up); k.addEventListener('pointercancel',up);
+  });
+}
+
+function tourModal(t){
+  const isNew = !t;
+  t = t || {name:'', format:'suis', nRounds:5};
+  const started = !isNew && t.status!=='inscripcio';
+  modal(`<h3 class="tt">${isNew?'Nou torneig':'Editar torneig'}</h3>
+    <label class="f">Nom</label><input type="text" id="mName" value="${esc(t.name)}" placeholder="p. ex. Torneig de Nadal 1r MEF">
+    <label class="f">Format</label>
+    <div class="seg" id="mFmt">${[['suis','Suís'],['lliga','Lliga']].map(([k,l])=>`<button class="${t.format===k?'on':''}" data-v="${k}" ${started?'disabled':''}>${l}</button>`).join('')}</div>
+    <p class="muted" id="mFmtTxt" style="font-size:.88rem;margin:.6em 0 0"></p>
+    <div id="mRoundsBox"><label class="f">Nombre de rondes</label><input type="number" id="mRounds" min="1" max="15" value="${t.nRounds||5}"></div>
+    ${isNew?`<label class="f" style="display:flex;gap:10px;align-items:center;font-weight:400"><input type="checkbox" id="mProfs" style="width:24px;height:24px"> Inscriure-hi tot el professorat</label>`:''}
+    <div class="acts">
+      ${!isNew?`<button class="btn warn" data-del style="margin-right:auto">Esborrar</button>`:''}
+      ${!isNew&&started?`<button class="btn" data-reset>Tornar a inscripció</button>`:''}
+      <button class="btn" data-x>Cancel·lar</button><button class="btn pri" data-ok>${isNew?'Crear':'Desar'}</button></div>`,
+  d=>{
+    let fmtv=t.format;
+    const upd=()=>{ d.querySelector('#mFmtTxt').textContent = fmtv==='suis'
+        ? 'Ideal per a molts jugadors: cada ronda s\'aparella gent amb punts semblants, sense repetir rival.'
+        : 'Tothom juga contra tothom. Recomanat fins a ~12 jugadors (amb 10 són 9 rondes).';
+      d.querySelector('#mRoundsBox').classList.toggle('hidden', fmtv!=='suis'); };
+    upd();
+    d.querySelectorAll('#mFmt button').forEach(b=>b.onclick=()=>{ fmtv=b.dataset.v; d.querySelectorAll('#mFmt button').forEach(x=>x.classList.toggle('on',x===b)); upd(); });
+    d.querySelector('[data-x]').onclick=()=>d.remove();
+    d.querySelector('[data-ok]').onclick=()=>{
+      const name=d.querySelector('#mName').value.trim(); if(!name){ toast('Posa-hi un nom'); return; }
+      const nr = Math.max(1,Math.min(15, parseInt(d.querySelector('#mRounds').value)||5));
+      if(isNew){
+        const nt={id:uid(), name, format:fmtv, nRounds:fmtv==='suis'?nr:0, status:'inscripcio', playerIds:[], out:[], rounds:[], date:today()};
+        if(d.querySelector('#mProfs').checked) nt.playerIds = S.players.filter(p=>p.type==='prof').map(p=>p.id);
+        S.tournaments.unshift(nt); ui.view='tour'; ui.tid=nt.id; ui.sub='jug'; toast('Torneig creat');
+      } else {
+        t.name=name; if(!started) t.format=fmtv;
+        if(t.format==='suis'){ if(nr<t.rounds.length){ toast(`Ja s'han jugat ${t.rounds.length} rondes`); return; } t.nRounds=nr; }
+        toast('Desat');
+      }
+      save(); d.remove(); render();
+    };
+    if(!isNew){
+      d.querySelector('[data-del]').onclick=()=>{ d.remove(); slideConfirm('Esborrar torneig', `S'esborrarà <b>${esc(t.name)}</b> amb totes les rondes i resultats. Les persones es mantenen.`, 'Llisca per esborrar', ()=>{
+        S.tournaments=S.tournaments.filter(x=>x.id!==t.id); save(); ui.view='home'; render(); toast('Torneig esborrat'); }); };
+      const rs=d.querySelector('[data-reset]'); if(rs) rs.onclick=()=>{ d.remove(); slideConfirm('Tornar a inscripció', 'Es perdran tots els aparellaments i resultats d\'aquest torneig.', 'Llisca per reiniciar', ()=>{
+        t.rounds=[]; t.out=[]; t.status='inscripcio'; ui.sub='jug'; save(); render(); toast('Torneig reiniciat'); }); };
+    }
+    setTimeout(()=>d.querySelector('#mName').focus(),50);
+  });
+}
+
+function personModal(p){
+  const inT = S.tournaments.filter(t=>t.playerIds.includes(p.id));
+  const played = S.tournaments.some(t=>t.rounds.flat().some(g=>g.w===p.id||g.b===p.id));
+  modal(`<h3 class="tt">Editar persona</h3>
+    <label class="f">Nom i cognom</label><input type="text" id="eName" value="${esc(p.name)}">
+    <div class="row"><div style="flex:1;min-width:140px"><label class="f">Tipus</label><select id="eType"><option value="alum" ${p.type==='alum'?'selected':''}>Alumnat</option><option value="prof" ${p.type==='prof'?'selected':''}>Professorat</option></select></div>
+    <div style="flex:1;min-width:140px"><label class="f">Grup</label><input type="text" id="eGroup" value="${esc(p.group||'')}"></div></div>
+    ${inT.length?`<p class="muted" style="font-size:.88rem">Inscrit/a a: ${inT.map(t=>esc(t.name)).join(', ')}</p>`:''}
+    <div class="acts"><button class="btn warn" data-del style="margin-right:auto">Esborrar</button><button class="btn" data-x>Cancel·lar</button><button class="btn pri" data-ok>Desar</button></div>`,
+  d=>{
+    d.querySelector('[data-x]').onclick=()=>d.remove();
+    d.querySelector('[data-ok]').onclick=()=>{ const n=d.querySelector('#eName').value.trim(); if(!n) return toast('Posa-hi un nom');
+      p.name=n; p.type=d.querySelector('#eType').value; p.group=d.querySelector('#eGroup').value.trim(); save(); d.remove(); render(); toast('Desat'); };
+    d.querySelector('[data-del]').onclick=()=>{
+      if(played){ toast('Ja té partides jugades: no es pot esborrar'); return; }
+      d.remove(); slideConfirm('Esborrar persona', `<b>${esc(p.name)}</b> desapareixerà de la llista i de les inscripcions.`, 'Llisca per esborrar', ()=>{
+        S.players=S.players.filter(x=>x.id!==p.id); S.tournaments.forEach(t=>t.playerIds=t.playerIds.filter(id=>id!==p.id)); save(); render(); toast('Persona esborrada'); });
+    };
+  });
+}
+
+/* ---------- 7. PROJECCIÓ I MODE INSCRIPCIÓ ---------- */
+let fsMode='ron';
+function project(){
+  const t=T(ui.tid); if(!t) return;
+  const L=$('#layer'); const d=document.createElement('div'); d.className='fs'; L.appendChild(d);
+  const draw=()=>{
+    const ri = Math.min(ui.round, t.rounds.length-1), r=t.rounds[ri]||[];
+    let n=0, body='';
+    if(fsMode==='ron') body = `<div class="fsg">${r.map(g=>{ if(g.b==null) return `<div class="fsgame"><span class="t">–</span><span style="grid-column:2/5">${esc(P(g.w).name)} <span class="vs">descansa</span></span></div>`; n++;
+      const rs = g.res ? g.res.replace('-',' – ') : 'vs';
+      return `<div class="fsgame"><span class="t">${n}</span><span>♔ ${esc(P(g.w).name)}</span><span class="vs">${rs}</span><span>♚ ${esc(P(g.b).name)}</span></div>`; }).join('')}</div>`;
+    else { const st=standings(t); body = `<table class="st"><thead><tr><th>#</th><th>Jugador/a</th><th style="text-align:right">Punts</th></tr></thead><tbody>${st.map((x,i)=>`<tr><td class="pos">${i+1}</td><td><b>${esc(P(x.id).name)}</b></td><td class="n pts">${fmt(x.pts)}</td></tr>`).join('')}</tbody></table>`; }
+    d.innerHTML = `<div class="fsbar"><h2 class="tt" style="flex:1">${esc(t.name)} ${fsMode==='ron'?'· Ronda '+(ri+1):''}</h2>
+      <button class="btn ${fsMode==='ron'?'on':''}" data-m="ron">Ronda</button><button class="btn ${fsMode==='cla'?'on':''}" data-m="cla">Classificació</button><button class="btn" data-m="x">✕ Sortir</button></div>${body}`;
+    d.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{ if(b.dataset.m==='x'){ try{document.exitFullscreen&&document.fullscreenElement&&document.exitFullscreen();}catch(e){} d.remove(); return; } fsMode=b.dataset.m; draw(); });
+  };
+  draw(); try{ d.requestFullscreen && d.requestFullscreen(); }catch(e){}
+}
+function kiosk(){
+  const t=T(ui.tid); const L=$('#layer'); const d=document.createElement('div'); d.className='fs'; L.appendChild(d);
+  d.innerHTML = `<div class="fsbar"><span style="flex:1"></span><button class="btn" data-x>✕ Sortir</button></div>
+   <div class="kiosk"><div style="font-size:4rem">♞</div><h2 class="tt">Apunta't!</h2><p style="font-size:1.2rem;color:#CFE0EE">${esc(t.name)}</p>
+   <input type="text" id="kN" placeholder="Nom i cognom" autocomplete="off"><input type="text" id="kG" placeholder="Grup (p. ex. 1r MEF)" autocomplete="off" style="margin-top:10px">
+   <button class="btn ok" id="kOk">Inscriure'm</button><div class="okmsg" id="kMsg"></div>
+   <p style="color:#CFE0EE">Inscrits: <b id="kC">${t.playerIds.length}</b></p></div>`;
+  const go=()=>{ const n=d.querySelector('#kN').value.trim(), g=d.querySelector('#kG').value.trim(); if(n.length<3){ d.querySelector('#kMsg').textContent='Escriu el nom complet'; return; }
+    let p = S.players.find(x=>norm(x.name)===norm(n));
+    if(!p){ p={id:uid(), name:n, type:'alum', group:g}; S.players.push(p); }
+    if(t.playerIds.includes(p.id)){ d.querySelector('#kMsg').textContent=`${p.name}, ja hi eres!`; }
+    else { t.playerIds.push(p.id); save(); d.querySelector('#kMsg').textContent=`✓ ${p.name}, ja estàs inscrit/a!`; }
+    d.querySelector('#kC').textContent=t.playerIds.length; d.querySelector('#kN').value=''; d.querySelector('#kN').focus(); };
+  d.querySelector('#kOk').onclick=go; d.querySelector('#kG').addEventListener('keydown',e=>{ if(e.key==='Enter') go(); });
+  d.querySelector('#kN').addEventListener('keydown',e=>{ if(e.key==='Enter') d.querySelector('#kG').focus(); });
+  d.querySelector('[data-x]').onclick=()=>{ d.remove(); render(); };
+  setTimeout(()=>d.querySelector('#kN').focus(),50);
+}
+
+/* ---------- 8. MENÚ ⋮ (estil WhatsApp) ---------- */
+function openMenu(){
+  const L=$('#layer'); const sh=document.createElement('div'); sh.className='sheet'; L.appendChild(sh);
+  const page=(title, body, root)=>{ const p=document.createElement('div'); p.className='page in';
+    p.innerHTML=`<div class="pbar"><button data-back aria-label="Enrere">‹</button><h3 class="tt">${title}</h3><span></span></div>${body}`;
+    sh.appendChild(p); requestAnimationFrame(()=>requestAnimationFrame(()=>p.classList.remove('in')));
+    p.querySelector('[data-back]').onclick=()=>{ p.classList.add('in'); setTimeout(()=>{ p.remove(); if(root) sh.remove(); },250); };
+    return p; };
+  const main = page('Menú', `
+    <button class="mitem" data-p="asp"><span class="dia" style="background:var(--sky)"></span><span>Aspecte<small>Tema, daltònics, mida de lletra</small></span></button>
+    <button class="mitem" data-p="bak"><span class="dia" style="background:var(--turq)"></span><span>Còpia de seguretat<small>Exportar i importar dades</small></span></button>
+    <button class="mitem" data-p="web"><span class="dia" style="background:var(--gold)"></span><span>Publicar al web<small>Que tothom vegi els resultats a GitHub</small></span></button>
+    <button class="mitem" data-p="del"><span class="dia" style="background:var(--coral)"></span><span>Esborrar-ho tot<small>Tornar a començar de zero</small></span></button>
+    <button class="mitem" data-p="about"><span class="dia" style="background:var(--navy)"></span><span>Com funciona<small>Formats, desempats i on es guarden les dades</small></span></button>`, true);
+  main.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>({asp,bak,web,del,about})[b.dataset.p]());
+
+  function asp(){
+    const p=S.prefs;
+    const pg=page('Aspecte', `<div class="pbody">
+      <label class="f">Tema</label><div class="seg" id="aT">${[['auto','Automàtic'],['light','Clar'],['dark','Fosc']].map(([k,l])=>`<button class="${p.theme===k?'on':''}" data-v="${k}">${l}</button>`).join('')}</div>
+      <label class="f">Colors per a daltònics</label><div class="seg" id="aC"><button class="${!p.cb?'on':''}" data-v="0">No</button><button class="${p.cb?'on':''}" data-v="1">Sí (blau / taronja)</button></div>
+      <label class="f">Mida de la lletra</label><div class="seg" id="aB"><button class="${!p.big?'on':''}" data-v="0">Normal</button><button class="${p.big?'on':''}" data-v="1">Gran</button></div>
+      <p class="muted" style="margin-top:20px">Els resultats també es marquen amb ✓ i xifres, no només amb color.</p></div>`);
+    const seg=(id,fn)=>pg.querySelectorAll(id+' button').forEach(b=>b.onclick=()=>{ fn(b.dataset.v); pg.querySelectorAll(id+' button').forEach(x=>x.classList.toggle('on',x===b)); applyPrefs(); save(); });
+    seg('#aT',v=>p.theme=v); seg('#aC',v=>p.cb=v==='1'); seg('#aB',v=>p.big=v==='1');
+  }
+  function bak(){
+    const pg=page('Còpia de seguretat', `<div class="pbody">
+      <p>Les dades es guarden <b>en aquest navegador</b>. Fes una còpia de tant en tant i sempre abans de canviar d'ordinador.</p>
+      <button class="btn pri" style="width:100%" data-e>⬇ Exportar còpia (.json)</button>
+      <p style="margin-top:22px">Importar una còpia <b>substitueix</b> totes les dades actuals.</p>
+      <input type="file" id="impF" accept=".json,application/json" class="hidden">
+      <button class="btn" style="width:100%" data-i>⬆ Importar còpia</button></div>`);
+    pg.querySelector('[data-e]').onclick=()=>download(backupName(), S);
+    const f=pg.querySelector('#impF');
+    pg.querySelector('[data-i]').onclick=()=>f.click();
+    f.onchange=()=>{ const file=f.files[0]; if(!file) return; const rd=new FileReader();
+      rd.onload=()=>{ let d; try{ d=sanitize(JSON.parse(rd.result)); }catch(e){ toast('El fitxer no és una còpia vàlida'); return; }
+        slideConfirm('Importar còpia', `Es substituiran les dades actuals per les del fitxer (${d.tournaments.length} tornejos, ${d.players.length} persones).`, 'Llisca per importar', ()=>{ S=d; save(); applyPrefs(); ui.view='home'; sh.remove(); render(); toast('Còpia importada'); }); };
+      rd.readAsText(file); f.value=''; };
+  }
+  function web(){
+    const pg=page('Publicar al web', `<div class="pbody">
+      <p>GitHub Pages és una web estàtica: no guarda res per si sola. Per publicar els resultats:</p>
+      <p><b>1.</b> Descarrega <b>dades.json</b>.<br><b>2.</b> Puja'l al repositori, al costat d'<b>index.html</b> (substituint l'anterior).<br><b>3.</b> En un minut, qui obri la web veurà els tornejos actualitzats.</p>
+      <button class="btn pri" style="width:100%" data-d>⬇ Descarregar dades.json</button>
+      <p style="margin-top:22px">En un altre ordinador o mòbil, carrega aquí la darrera versió publicada:</p>
+      <button class="btn" style="width:100%" data-l>⟳ Carregar dades publicades</button></div>`);
+    pg.querySelector('[data-d]').onclick=()=>download('dades.json', S);
+    pg.querySelector('[data-l]').onclick=async()=>{ let d; try{ const r=await fetch('dades.json?'+Date.now(),{cache:'no-store'}); if(!r.ok) throw 0; d=sanitize(await r.json()); }catch(e){ toast('No s\'ha trobat dades.json al web'); return; }
+      slideConfirm('Carregar dades publicades', 'Les dades d\'aquest navegador se substituiran per les publicades.', 'Llisca per carregar', ()=>{ d.prefs=S.prefs; S=d; save(); ui.view='home'; sh.remove(); render(); toast('Dades publicades carregades'); }); };
+  }
+  function del(){
+    slideConfirm('Esborrar-ho tot', 'S\'esborraran tots els tornejos i persones d\'aquest navegador. Es tornarà a carregar la llista inicial del professorat.', 'Llisca per esborrar', ()=>{ const pr=S.prefs; S=seed(); S.prefs=pr; save(); ui.view='home'; sh.remove(); render(); toast('Tot esborrat'); });
+  }
+  function about(){
+    page('Com funciona', `<div class="pbody">
+      <p><b>Suís:</b> cada ronda s'aparella gent amb punts semblants i sense repetir rival. Va bé per a grups grans (alumnat). Amb n jugadors, ⌈log₂ n⌉ + 1 o 2 rondes ja donen un guanyador clar.</p>
+      <p><b>Lliga:</b> tothom contra tothom. Les rondes es generen totes de cop. Si són senars, cada ronda descansa algú (0 punts, i tothom descansa una vegada).</p>
+      <p><b>Desempats:</b> Buchholz al suís (suma de punts dels rivals) i Sonneborn-Berger a la lliga.</p>
+      <p><b>Colors:</b> el programa alterna blanques ♔ i negres ♚ per equilibrar.</p>
+      <p><b>Dades:</b> tot es guarda al navegador d'aquest dispositiu. Fes còpies i publica <b>dades.json</b> perquè la resta ho vegi.</p>
+      <p class="muted">Institut Els 3 Turons · Arenys de Mar</p></div>`);
+  }
+}
+function backupName(){ const d=new Date(); const s=String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0'); return `${s}_Escacs-3Turons.json`; }
+function download(name, obj){ const b=new Blob([JSON.stringify(obj,null,1)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500); toast('Descarregat: '+name); }
+
+/* ---------- 9. ACCIONS ---------- */
+const A = {
+  go:d=>{ ui.view=d.v; ui.sub=null; scrollTo(0,0); render(); },
+  open:d=>{ ui.view='tour'; ui.tid=d.id; ui.sub=null; const t=T(d.id); const c=t.rounds.findIndex(r=>!roundDone(r)); ui.round = c<0 ? Math.max(0,t.rounds.length-1) : c; scrollTo(0,0); render(); },
+  sub:d=>{ ui.sub=d.v; render(); },
+  round:d=>{ ui.round=+d.v; render(); },
+  newT:()=>tourModal(null),
+  editT:()=>tourModal(T(ui.tid)),
+  menu:()=>openMenu(),
+  project:()=>project(),
+  kiosk:()=>kiosk(),
+  start:()=>{ const t=T(ui.tid); if(t.playerIds.length<2) return toast('Calen almenys 2 jugadors');
+    if(t.format==='lliga'){ t.rounds = roundRobin(t.playerIds); }
+    else { if(!t.nRounds) t.nRounds=suggestRounds(t.playerIds.length); t.rounds=[swissRound(t)]; }
+    t.status='enjoc'; ui.sub='ron'; ui.round=0; save(); render(); toast('Torneig començat! Bona partida ♟'); },
+  nextRound:()=>{ const t=T(ui.tid); t.rounds.push(swissRound(t)); ui.round=t.rounds.length-1; save(); render(); toast('Ronda '+t.rounds.length+' generada'); },
+  res:d=>{ const t=T(ui.tid); const g=t.rounds[ui.round][+d.g]; g.res = g.res===d.v ? null : d.v; save(); render();
+    if(roundDone(t.rounds[ui.round]) && g.res) toast('Ronda '+(ui.round+1)+' completa ✓'); },
+  finish:()=>{ const t=T(ui.tid); t.status='acabat'; ui.sub='cla'; save(); render(); toast('🏆 Guanyador/a: '+P(standings(t)[0].id).name); },
+  reopen:()=>{ const t=T(ui.tid); t.status='enjoc'; save(); render(); },
+  enrol:d=>{ const t=T(ui.tid); if(!t.playerIds.includes(d.id)) t.playerIds.push(d.id); save(); render(); },
+  unenrol:d=>{ const t=T(ui.tid); t.playerIds=t.playerIds.filter(x=>x!==d.id); save(); render(); },
+  withdraw:d=>{ const t=T(ui.tid); t.out = t.out.includes(d.id) ? t.out.filter(x=>x!==d.id) : [...t.out, d.id]; save(); render(); },
+  enrolAll:()=>{ const t=T(ui.tid); const l=pickerList(t); if(!l.length) return; l.forEach(p=>t.playerIds.push(p.id)); save(); render(); toast(l.length+' inscrits'); },
+  filt:d=>{ ui.filt=d.v; render(); },
+  pfilt:d=>{ ui.pfilt=d.v; render(); },
+  quickAdd:()=>{ const t=T(ui.tid); const n=$('#qaName').value.trim(), g=$('#qaGroup').value.trim(); if(!n) return toast('Escriu un nom');
+    let p=S.players.find(x=>norm(x.name)===norm(n)); if(!p){ p={id:uid(), name:n, type:'alum', group:g}; S.players.push(p); }
+    if(!t.playerIds.includes(p.id)) t.playerIds.push(p.id); save(); render(); toast(p.name+' inscrit/a'); setTimeout(()=>{ const i=$('#qaName'); if(i) i.focus(); },30);
+    const gi=$('#qaGroup'); if(gi) gi.value=g; },
+  addPerson:()=>{ const n=$('#npName').value.trim(); if(!n) return toast('Escriu un nom');
+    if(S.players.some(x=>norm(x.name)===norm(n))) return toast('Aquesta persona ja hi és');
+    S.players.push({id:uid(), name:n, type:$('#npType').value, group:$('#npGroup').value.trim()}); save(); const keep=[$('#npType').value,$('#npGroup').value]; render();
+    $('#npType').value=keep[0]; $('#npGroup').value=keep[1]; $('#npName').focus(); toast(n+' afegit/da'); },
+  bulkAdd:()=>{ const def=$('#bulkGroup').value.trim(); let k=0, dup=0;
+    $('#bulk').value.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).forEach(l=>{ const [n,g]=l.split(/[;\t]/).map(s=>s.trim());
+      if(!n) return; if(S.players.some(x=>norm(x.name)===norm(n))){ dup++; return; }
+      S.players.push({id:uid(), name:n, type:'alum', group:g||def}); k++; });
+    save(); render(); toast(`${k} afegits`+(dup?` · ${dup} ja hi eren`:'')); },
+  editP:d=>personModal(S.players.find(p=>p.id===d.id)),
+};
+document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el || el.disabled) return; const f=A[el.dataset.act]; if(f){ e.preventDefault(); f(el.dataset, el, e); } });
+document.addEventListener('input',e=>{
+  if(e.target.id==='pq'){ ui.q=e.target.value; fillPicker(); }
+  if(e.target.id==='ppq'){ ui.pq=e.target.value; fillPeople(); }
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter' && (e.target.id==='qaName'||e.target.id==='qaGroup')) A.quickAdd();
+  if(e.key==='Enter' && e.target.id==='npName') A.addPerson();
+  if(e.key==='Escape'){ const L=$('#layer'); if(L.lastElementChild && L.lastElementChild.classList.contains('scrim')) closeTop(); }
+});
+
+/* ---------- 10. ARRENCADA ---------- */
+(async function boot(){
+  S = load();
+  if(S){ try{ S=sanitize(S); }catch(e){ S=null; } }
+  if(!S){ // primera visita: dades publicades al repositori, si n'hi ha
+    try{ const r=await fetch('dades.json',{cache:'no-store'}); if(r.ok) S=sanitize(await r.json()); }catch(e){}
+    if(!S) S=seed();
+    save();
+  }
+  applyPrefs(); render();
+})();
+</script>
+</body>
+</html>
