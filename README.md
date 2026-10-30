@@ -6,7 +6,8 @@ Gestor de tornejos d'escacs de l'Institut Els 3 Turons (Arenys de Mar).
 
 ## Com s'usa
 - **Vista pública** (per defecte): rondes, resultats i classificació, sense botons d'editar.
-- **Mode organització**: *⋮ → Mode organització* + PIN. Permet crear tornejos, inscriure professorat i alumnat i posar resultats.
+- **Inscripció pública**: qualsevol persona pot sol·licitar la inscripció (nom i correu) al torneig obert o als propers. Els correus no es publiquen mai.
+- **Mode organització**: *⋮ → Mode organització* + PIN. Permet crear tornejos, acceptar o rebutjar sol·licituds, inscriure professorat i alumnat i posar resultats.
 
 ## Dades compartides amb Google Sheets (recomanat)
 Les dades es guarden en un full de Google. Qui té el PIN pot posar resultats des de qualsevol dispositiu i tothom ho veu en directe (cada 20 s).
@@ -25,4 +26,4 @@ Si `API_URL` és buit, les dades es guarden al navegador de l'organització i es
 - `index.html` — l'aplicació (un sol fitxer, sense dependències).
 - `apps-script.gs` — codi per al full de Google.
 - `dades.json` — (opcional, mode local) dades publicades.
-- `logo.png` — (opcional) logotip del centre en blanc per a la capçalera.
+- `logo.png` — logotip del centre en blanc (ja va incrustat a `index.html`).
