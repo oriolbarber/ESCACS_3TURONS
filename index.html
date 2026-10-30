@@ -47,6 +47,8 @@ header.top .wrap{display:flex;align-items:center;gap:14px;min-height:92px;positi
 .diamonds i:nth-child(2){background:var(--gold);right:44px;top:-10px}
 .diamonds i:nth-child(3){background:var(--turq);right:88px;top:-40px}
 .diamonds i:nth-child(4){background:var(--sky);right:132px;top:-6px}
+.adm{display:inline-block;margin-left:10px;vertical-align:middle;background:var(--gold);color:#3b2d00;font-size:.62rem;font-weight:800;letter-spacing:.06em;padding:4px 9px;border-radius:99px}
+.pend{font-size:.85rem;color:var(--muted);font-weight:700}
 .iconbtn{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:1.7rem;color:#fff;background:rgba(255,255,255,.12)}
 .iconbtn:active{background:rgba(255,255,255,.25)}
 nav.tabs{background:var(--navy);border-top:1px solid rgba(255,255,255,.12)}
@@ -217,7 +219,7 @@ table.st tr.out td{opacity:.5}
       <img src="logo.png" alt="Institut Els 3 Turons" onerror="this.remove();document.getElementById('kn').classList.remove('hidden')">
       <span id="kn" class="knight hidden">♞</span>
       <div style="min-width:0">
-        <h1 class="tt">Escacs</h1>
+        <h1 class="tt">Escacs<span id="admBadge" class="adm hidden">ORGANITZACIÓ</span></h1>
         <small class="tt">Institut Els 3 Turons · Arenys de Mar</small>
       </div>
     </div>
@@ -241,7 +243,9 @@ table.st tr.out td{opacity:.5}
    ========================================================= */
 
 /* ---------- 1. DADES INICIALS ---------- */
-const KEY = 'escacs3t_v1';
+const KEY = 'escacs3t_v1';          // dades de treball de l'organització (només aquest navegador)
+const PREF_KEY = 'escacs3t_prefs';   // aspecte (de cada dispositiu)
+const ADM_KEY = 'escacs3t_admin';    // '1' si aquest dispositiu està en mode organització
 const PROFESSORAT = ['David Filgaira','Roc Biosca','Manel Jimenez','Oriol Barber','Oriol Berengueres',
   'Alicia Martin','Victor Aguilar','Tomas Martinez','Brian David Saimur','Alberto Bernabeu'];
 
@@ -253,7 +257,6 @@ function seed(){
       id:uid(), name:'Torneig del professorat 2026-27', format:'lliga', nRounds:0,
       status:'inscripcio', playerIds:players.map(p=>p.id), out:[], rounds:[], date:today()
     }],
-    prefs:{theme:'auto', cb:false, big:false}
   };
 }
 
@@ -267,15 +270,20 @@ function norm(s){ return String(s).toLowerCase().normalize('NFD').replace(/[\u03
 const $ = s => document.querySelector(s);
 
 let S = null;
+let PR = {theme:'auto', cb:false, big:false};
+let admin = false;
 const ui = { view:'home', tid:null, sub:null, round:0, q:'', filt:'tots', pq:'', pfilt:'tots' };
 
-function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ toast('⚠️ No s\'ha pogut desar al navegador'); } }
+function save(){ if(!admin) return; try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ toast('⚠️ No s\'ha pogut desar al navegador'); } }
+function savePrefs(){ try{ localStorage.setItem(PREF_KEY, JSON.stringify(PR)); }catch(e){} }
+async function fetchPub(){ try{ const r=await fetch('dades.json?'+Date.now(),{cache:'no-store'}); if(!r.ok) return null; return sanitize(await r.json()); }catch(e){ return null; } }
+function pinHash(s){ let x=5381; for(const c of 'escacs3t:'+s) x=((x<<5)+x+c.charCodeAt(0))|0; return (x>>>0).toString(36); }
 function load(){ try{ const j = localStorage.getItem(KEY); return j ? JSON.parse(j) : null; }catch(e){ return null; } }
 function P(id){ return S.players.find(p=>p.id===id) || {id, name:'(persona esborrada)', type:'alum', group:''}; }
 function T(id){ return S.tournaments.find(t=>t.id===id); }
 function sanitize(d){
   if(!d || !Array.isArray(d.players) || !Array.isArray(d.tournaments)) throw new Error('Format no vàlid');
-  d.prefs = Object.assign({theme:'auto',cb:false,big:false}, d.prefs||{});
+  delete d.prefs;
   d.tournaments.forEach(t=>{ t.out=t.out||[]; t.rounds=t.rounds||[]; t.playerIds=t.playerIds||[]; });
   return d;
 }
@@ -284,7 +292,9 @@ let toastT;
 function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('on'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('on'),2400); }
 
 function applyPrefs(){
-  const r=document.documentElement, p=S.prefs;
+  const r=document.documentElement, p=PR;
+  $('#admBadge').classList.toggle('hidden', !admin);
+  $('#tab-people').classList.toggle('hidden', !admin);
   if(p.theme==='auto') r.removeAttribute('data-theme'); else r.dataset.theme=p.theme;
   r.dataset.cb = p.cb ? '1':'0'; r.dataset.big = p.big ? '1':'0';
 }
@@ -375,11 +385,12 @@ function totalRounds(t){ return t.format==='lliga' ? t.rounds.length : t.nRounds
 
 /* ---------- 5. RENDER PRINCIPAL ---------- */
 function render(){
+  if(!S){ $('#app').innerHTML='<div class="empty">Carregant…</div>'; return; }
   $('#tab-home').classList.toggle('on', ui.view!=='people');
   $('#tab-people').classList.toggle('on', ui.view==='people');
   const app=$('#app');
   if(ui.view==='tour' && T(ui.tid)) app.innerHTML = vTour(T(ui.tid));
-  else if(ui.view==='people') { app.innerHTML = vPeople(); fillPeople(); }
+  else if(ui.view==='people' && admin) { app.innerHTML = vPeople(); fillPeople(); }
   else { ui.view='home'; app.innerHTML = vHome(); }
   if(ui.view==='tour' && ui.sub==='jug') fillPicker();
 }
@@ -409,19 +420,20 @@ function vHome(){
   return `
   <div class="spread" style="margin-bottom:16px">
     <h2 class="sec tt">Tornejos</h2>
-    <button class="btn pri" data-act="newT">＋ Nou torneig</button>
+    ${admin?`<button class="btn pri" data-act="newT">＋ Nou torneig</button>`:''}
   </div>
   ${act.length ? `<div class="grid">${act.map(card).join('')}</div>`
-    : `<div class="card empty"><div class="big">♜</div><p>No hi ha cap torneig en marxa.</p><button class="btn pri" data-act="newT">＋ Crear-ne un</button></div>`}
+    : `<div class="card empty"><div class="big">♜</div><p>No hi ha cap torneig en marxa.</p>${admin?`<button class="btn pri" data-act="newT">＋ Crear-ne un</button>`:''}</div>`}
   ${fin.length ? `<details class="more"><summary>Acabats (${fin.length})</summary><div class="grid">${fin.map(card).join('')}</div></details>`:''}`;
 }
 
 /* --- Vista d'un torneig --- */
 function vTour(t){
-  if(!ui.sub) ui.sub = t.status==='inscripcio' ? 'jug' : 'ron';
+  if(!ui.sub) ui.sub = t.status==='inscripcio' ? 'jug' : (admin ? 'ron' : 'cla');
   const sub = ui.sub;
   let actions='';
-  if(t.status==='inscripcio') actions = `<button class="btn ok" data-act="start" ${t.playerIds.length<2?'disabled':''}>▶ Començar</button>`;
+  if(!admin) actions='';
+  else if(t.status==='inscripcio') actions = `<button class="btn ok" data-act="start" ${t.playerIds.length<2?'disabled':''}>▶ Començar</button>`;
   else if(t.status==='enjoc'){
     const allDone = t.rounds.length && t.rounds.every(roundDone) && t.rounds.length>=totalRounds(t);
     if(allDone) actions = `<button class="btn ok" data-act="finish">🏆 Tancar torneig</button>`;
@@ -435,7 +447,7 @@ function vTour(t){
     <h2 class="sec tt" style="font-size:1.5rem">${esc(t.name)}</h2>
     <div class="row">
       ${t.status!=='inscripcio'?`<button class="btn sm" data-act="project">⛶ Projectar</button>`:''}
-      <button class="btn sm" data-act="editT">✎ Editar</button>
+      ${admin?`<button class="btn sm" data-act="editT">✎ Editar</button>`:''}
       ${actions}
     </div>
   </div>
@@ -445,9 +457,9 @@ function vTour(t){
 }
 
 function vRounds(t){
-  if(t.status==='inscripcio') return `<div class="card empty"><div class="big">♟</div><p>Quan la llista de jugadors estigui a punt, prem <b>Començar</b> i es generaran els aparellaments.</p></div>`;
+  if(t.status==='inscripcio') return `<div class="card empty"><div class="big">♟</div><p>${admin?'Quan la llista de jugadors estigui a punt, prem <b>Començar</b> i es generaran els aparellaments.':'El torneig encara no ha començat. Consulta qui hi està inscrit a <b>Jugadors</b>.'}</p></div>`;
   if(ui.round>=t.rounds.length) ui.round = Math.max(0, t.rounds.length-1);
-  const ri = ui.round, r = t.rounds[ri], lock = t.status==='acabat';
+  const ri = ui.round, r = t.rounds[ri], lock = t.status==='acabat' || !admin;
   const chips = t.rounds.map((x,i)=>`<button class="${i===ri?'on':''} ${roundDone(x)?'done':''}" data-act="round" data-v="${i}">${i+1}</button>`).join('')
     + (t.format==='suis' ? Array.from({length:Math.max(0,t.nRounds-t.rounds.length)},(_,i)=>`<button disabled style="opacity:.35">${t.rounds.length+i+1}</button>`).join('') : '');
   const real = r.filter(g=>g.b!=null), done = real.filter(g=>g.res).length;
@@ -462,11 +474,11 @@ function vRounds(t){
       <div class="tbl tt">Taula ${n}</div>
       ${pl(g.w,'♔',wW,bW, wW?'✓ 1':bW?'0':dr?'½':'')}
       ${pl(g.b,'♚',bW,wW, bW?'✓ 1':wW?'0':dr?'½':'')}
-      <div class="res">${b('1-0','1 – 0','v1')}${b('½-½','½ – ½','vd')}${b('0-1','0 – 1','v0')}</div>
+      ${admin ? `<div class="res">${b('1-0','1 – 0','v1')}${b('½-½','½ – ½','vd')}${b('0-1','0 – 1','v0')}</div>` : (g.res?'':'<div class="pend">⏳ Pendent de jugar</div>')}
     </div>`;
   }).join('');
   let next='';
-  if(t.status==='enjoc' && t.format==='suis' && roundDone(r) && ri===t.rounds.length-1 && t.rounds.length<t.nRounds)
+  if(admin && t.status==='enjoc' && t.format==='suis' && roundDone(r) && ri===t.rounds.length-1 && t.rounds.length<t.nRounds)
     next = `<div class="card" style="margin-top:14px;text-align:center"><p style="margin-top:0">Ronda ${ri+1} completa.</p><button class="btn pri" data-act="nextRound">Generar ronda ${ri+2}</button></div>`;
   return `<div class="rounds">${chips}</div>
     <div class="spread" style="margin-bottom:10px"><b class="tt">Ronda ${ri+1}</b><span class="muted">${done}/${real.length} resultats</span></div>
@@ -487,18 +499,18 @@ function vStand(t){
 }
 
 function vEnrol(t){
-  const canAdd = t.status==='inscripcio' || (t.status==='enjoc' && t.format==='suis');
-  const canRm = t.status==='inscripcio';
-  const midSwiss = t.status==='enjoc' && t.format==='suis';
+  const canAdd = admin && (t.status==='inscripcio' || (t.status==='enjoc' && t.format==='suis'));
+  const canRm = admin && t.status==='inscripcio';
+  const midSwiss = admin && t.status==='enjoc' && t.format==='suis';
   const enrolled = t.playerIds.map(P).sort((a,b)=>a.name.localeCompare(b.name));
   const left = `<div><div class="spread" style="margin-bottom:10px"><b class="tt">Inscrits (${enrolled.length})</b>
-      ${t.status==='inscripcio'?`<button class="btn sm" data-act="kiosk">📝 Mode inscripció</button>`:''}</div>
+      ${admin&&t.status==='inscripcio'?`<button class="btn sm" data-act="kiosk">📝 Mode inscripció</button>`:''}</div>
     <div class="plist">${enrolled.map(p=>`<div class="prow"><span class="badge ${p.type}">${p.type==='prof'?'PROF':'ALUM'}</span>
       <span class="nm">${esc(p.name)}<small>${esc(p.group||'')}</small></span>
       ${canRm?`<button class="rmbtn" data-act="unenrol" data-id="${p.id}" aria-label="Treure">✕</button>`:''}
       ${midSwiss?`<button class="btn sm" data-act="withdraw" data-id="${p.id}">${t.out.includes(p.id)?'Reincorporar':'Retirar'}</button>`:''}
     </div>`).join('') || '<div class="empty">Encara no hi ha ningú inscrit.</div>'}</div>
-    ${t.status==='enjoc'&&t.format==='lliga'?'<p class="muted">En una lliga no es poden afegir ni treure jugadors un cop començada.</p>':''}
+    ${admin&&t.status==='enjoc'&&t.format==='lliga'?'<p class="muted">En una lliga no es poden afegir ni treure jugadors un cop començada.</p>':''}
     ${midSwiss?'<p class="muted">Qui s\'afegeixi ara entra a la ronda següent amb 0 punts. Qui es retira ja no s\'aparella.</p>':''}</div>`;
   const right = canAdd ? `<div><b class="tt">Afegir</b>
     <div class="card" style="margin-top:10px">
@@ -515,7 +527,7 @@ function vEnrol(t){
       <button class="btn sm" data-act="enrolAll">＋ Tots els visibles</button>
     </div>
     <div class="plist" id="picker"></div></div>` : '';
-  return `<div class="cols">${left}${right}</div>`;
+  return admin ? `<div class="cols">${left}${right}</div>` : left;
 }
 function pickerList(t){
   return S.players.filter(p=>!t.playerIds.includes(p.id))
@@ -712,22 +724,40 @@ function openMenu(){
     sh.appendChild(p); requestAnimationFrame(()=>requestAnimationFrame(()=>p.classList.remove('in')));
     p.querySelector('[data-back]').onclick=()=>{ p.classList.add('in'); setTimeout(()=>{ p.remove(); if(root) sh.remove(); },250); };
     return p; };
-  const main = page('Menú', `
+  const main = page('Menú', admin ? `
+    <button class="mitem" data-p="org"><span class="dia" style="background:var(--gold)"></span><span>Mode organització<small>Canviar el PIN o sortir del mode</small></span></button>
     <button class="mitem" data-p="asp"><span class="dia" style="background:var(--sky)"></span><span>Aspecte<small>Tema, daltònics, mida de lletra</small></span></button>
     <button class="mitem" data-p="bak"><span class="dia" style="background:var(--turq)"></span><span>Còpia de seguretat<small>Exportar i importar dades</small></span></button>
     <button class="mitem" data-p="web"><span class="dia" style="background:var(--gold)"></span><span>Publicar al web<small>Que tothom vegi els resultats a GitHub</small></span></button>
     <button class="mitem" data-p="del"><span class="dia" style="background:var(--coral)"></span><span>Esborrar-ho tot<small>Tornar a començar de zero</small></span></button>
-    <button class="mitem" data-p="about"><span class="dia" style="background:var(--navy)"></span><span>Com funciona<small>Formats, desempats i on es guarden les dades</small></span></button>`, true);
-  main.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>({asp,bak,web,del,about})[b.dataset.p]());
+    <button class="mitem" data-p="about"><span class="dia" style="background:var(--navy)"></span><span>Com funciona<small>Formats, desempats i on es guarden les dades</small></span></button>` : `
+    <button class="mitem" data-p="refresh"><span class="dia" style="background:var(--turq)"></span><span>Actualitzar resultats<small>Carregar la darrera versió publicada</small></span></button>
+    <button class="mitem" data-p="asp"><span class="dia" style="background:var(--sky)"></span><span>Aspecte<small>Tema, daltònics, mida de lletra</small></span></button>
+    <button class="mitem" data-p="about"><span class="dia" style="background:var(--navy)"></span><span>Com funciona<small>Formats i desempats</small></span></button>
+    <button class="mitem" data-p="login"><span class="dia" style="background:var(--gold)"></span><span>Mode organització<small>Per gestionar els tornejos (cal PIN)</small></span></button>`, true);
+  main.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>({asp,bak,web,del,about,org,login,refresh})[b.dataset.p]());
+
+  async function refresh(){ const d=await fetchPub(); if(!d){ toast('Encara no hi ha dades publicades'); return; } S=d; sh.remove(); render(); toast('Resultats actualitzats'); }
+  function login(){ sh.remove(); pinLogin(); }
+  function org(){
+    const pg=page('Mode organització', `<div class="pbody">
+      <p>Aquest dispositiu està en <b>mode organització</b>: pot crear tornejos, inscriure gent i posar resultats. Es manté fins que en surtis.</p>
+      <p class="muted">El PIN evita canvis per error a la vista pública. No és una contrasenya forta: les dades oficials les protegeix GitHub (només qui pot pujar fitxers al repositori publica <b>dades.json</b>).</p>
+      <button class="btn" style="width:100%" data-c>🔑 Canviar el PIN</button>
+      <button class="btn warn" style="width:100%;margin-top:12px" data-o>Sortir del mode organització</button></div>`);
+    pg.querySelector('[data-c]').onclick=()=>{ sh.remove(); pinSet(); };
+    pg.querySelector('[data-o]').onclick=async()=>{ admin=false; try{localStorage.removeItem(ADM_KEY);}catch(e){} sh.remove();
+      const d=await fetchPub(); if(d) S=d; ui.view='home'; applyPrefs(); render(); toast('Vista pública. Les teves dades de treball es conserven.'); };
+  }
 
   function asp(){
-    const p=S.prefs;
+    const p=PR;
     const pg=page('Aspecte', `<div class="pbody">
       <label class="f">Tema</label><div class="seg" id="aT">${[['auto','Automàtic'],['light','Clar'],['dark','Fosc']].map(([k,l])=>`<button class="${p.theme===k?'on':''}" data-v="${k}">${l}</button>`).join('')}</div>
       <label class="f">Colors per a daltònics</label><div class="seg" id="aC"><button class="${!p.cb?'on':''}" data-v="0">No</button><button class="${p.cb?'on':''}" data-v="1">Sí (blau / taronja)</button></div>
       <label class="f">Mida de la lletra</label><div class="seg" id="aB"><button class="${!p.big?'on':''}" data-v="0">Normal</button><button class="${p.big?'on':''}" data-v="1">Gran</button></div>
       <p class="muted" style="margin-top:20px">Els resultats també es marquen amb ✓ i xifres, no només amb color.</p></div>`);
-    const seg=(id,fn)=>pg.querySelectorAll(id+' button').forEach(b=>b.onclick=()=>{ fn(b.dataset.v); pg.querySelectorAll(id+' button').forEach(x=>x.classList.toggle('on',x===b)); applyPrefs(); save(); });
+    const seg=(id,fn)=>pg.querySelectorAll(id+' button').forEach(b=>b.onclick=()=>{ fn(b.dataset.v); pg.querySelectorAll(id+' button').forEach(x=>x.classList.toggle('on',x===b)); applyPrefs(); savePrefs(); });
     seg('#aT',v=>p.theme=v); seg('#aC',v=>p.cb=v==='1'); seg('#aB',v=>p.big=v==='1');
   }
   function bak(){
@@ -742,7 +772,7 @@ function openMenu(){
     pg.querySelector('[data-i]').onclick=()=>f.click();
     f.onchange=()=>{ const file=f.files[0]; if(!file) return; const rd=new FileReader();
       rd.onload=()=>{ let d; try{ d=sanitize(JSON.parse(rd.result)); }catch(e){ toast('El fitxer no és una còpia vàlida'); return; }
-        slideConfirm('Importar còpia', `Es substituiran les dades actuals per les del fitxer (${d.tournaments.length} tornejos, ${d.players.length} persones).`, 'Llisca per importar', ()=>{ S=d; save(); applyPrefs(); ui.view='home'; sh.remove(); render(); toast('Còpia importada'); }); };
+        slideConfirm('Importar còpia', `Es substituiran les dades actuals per les del fitxer (${d.tournaments.length} tornejos, ${d.players.length} persones).`, 'Llisca per importar', ()=>{ S=d; save(); ui.view='home'; sh.remove(); render(); toast('Còpia importada'); }); };
       rd.readAsText(file); f.value=''; };
   }
   function web(){
@@ -753,11 +783,11 @@ function openMenu(){
       <p style="margin-top:22px">En un altre ordinador o mòbil, carrega aquí la darrera versió publicada:</p>
       <button class="btn" style="width:100%" data-l>⟳ Carregar dades publicades</button></div>`);
     pg.querySelector('[data-d]').onclick=()=>download('dades.json', S);
-    pg.querySelector('[data-l]').onclick=async()=>{ let d; try{ const r=await fetch('dades.json?'+Date.now(),{cache:'no-store'}); if(!r.ok) throw 0; d=sanitize(await r.json()); }catch(e){ toast('No s\'ha trobat dades.json al web'); return; }
-      slideConfirm('Carregar dades publicades', 'Les dades d\'aquest navegador se substituiran per les publicades.', 'Llisca per carregar', ()=>{ d.prefs=S.prefs; S=d; save(); ui.view='home'; sh.remove(); render(); toast('Dades publicades carregades'); }); };
+    pg.querySelector('[data-l]').onclick=async()=>{ const d=await fetchPub(); if(!d){ toast('No s\'ha trobat dades.json al web'); return; }
+      slideConfirm('Carregar dades publicades', 'Les dades d\'aquest navegador se substituiran per les publicades.', 'Llisca per carregar', ()=>{ d.pin=d.pin||S.pin; S=d; save(); ui.view='home'; sh.remove(); render(); toast('Dades publicades carregades'); }); };
   }
   function del(){
-    slideConfirm('Esborrar-ho tot', 'S\'esborraran tots els tornejos i persones d\'aquest navegador. Es tornarà a carregar la llista inicial del professorat.', 'Llisca per esborrar', ()=>{ const pr=S.prefs; S=seed(); S.prefs=pr; save(); ui.view='home'; sh.remove(); render(); toast('Tot esborrat'); });
+    slideConfirm('Esborrar-ho tot', 'S\'esborraran tots els tornejos i persones d\'aquest navegador. Es tornarà a carregar la llista inicial del professorat.', 'Llisca per esborrar', ()=>{ const pin=S.pin; S=seed(); S.pin=pin; save(); ui.view='home'; sh.remove(); render(); toast('Tot esborrat'); });
   }
   function about(){
     page('Com funciona', `<div class="pbody">
@@ -765,10 +795,40 @@ function openMenu(){
       <p><b>Lliga:</b> tothom contra tothom. Les rondes es generen totes de cop. Si són senars, cada ronda descansa algú (0 punts, i tothom descansa una vegada).</p>
       <p><b>Desempats:</b> Buchholz al suís (suma de punts dels rivals) i Sonneborn-Berger a la lliga.</p>
       <p><b>Colors:</b> el programa alterna blanques ♔ i negres ♚ per equilibrar.</p>
-      <p><b>Dades:</b> tot es guarda al navegador d'aquest dispositiu. Fes còpies i publica <b>dades.json</b> perquè la resta ho vegi.</p>
+      <p><b>Dades:</b> la vista pública mostra sempre la darrera versió publicada (<b>dades.json</b>). El mode organització treballa amb una còpia al navegador d'aquest dispositiu: fes còpies i publica <b>dades.json</b> perquè la resta ho vegi.</p>
       <p class="muted">Institut Els 3 Turons · Arenys de Mar</p></div>`);
   }
 }
+/* ---------- 8b. PIN DEL MODE ORGANITZACIÓ ---------- */
+function enterAdmin(work){ S=work; admin=true; try{localStorage.setItem(ADM_KEY,'1');}catch(e){} save(); ui.view='home'; applyPrefs(); render(); }
+function pinLogin(){
+  const work = sanitizeSafe(load()) || S;   // la còpia de treball d'aquest dispositiu, si n'hi ha
+  if(!work.pin){ pinSet(work); return; }
+  modal(`<h3 class="tt">Mode organització</h3><p class="muted">Escriu el PIN per gestionar els tornejos.</p>
+    <input type="password" id="pin1" inputmode="numeric" autocomplete="off" placeholder="PIN" style="font-size:1.4rem;text-align:center;letter-spacing:.3em">
+    <div class="acts"><button class="btn" data-x>Cancel·lar</button><button class="btn pri" data-ok>Entrar</button></div>`, d=>{
+    const go=()=>{ const v=d.querySelector('#pin1').value; if(pinHash(v)===work.pin){ d.remove(); enterAdmin(work); toast('Mode organització activat'); } else { d.querySelector('#pin1').value=''; toast('PIN incorrecte'); } };
+    d.querySelector('[data-x]').onclick=()=>d.remove(); d.querySelector('[data-ok]').onclick=go;
+    d.querySelector('#pin1').addEventListener('keydown',e=>{ if(e.key==='Enter') go(); });
+    setTimeout(()=>d.querySelector('#pin1').focus(),50);
+  });
+}
+function pinSet(work){
+  const first = !!work;
+  modal(`<h3 class="tt">${first?'Crea un PIN':'Canviar el PIN'}</h3><p class="muted">${first?'Encara no hi ha PIN. Tria\'n un per entrar al mode organització (mínim 4 caràcters).':'Escriu el PIN nou dues vegades.'}</p>
+    <input type="password" id="pa" inputmode="numeric" autocomplete="new-password" placeholder="PIN nou" style="font-size:1.3rem;text-align:center;letter-spacing:.3em">
+    <input type="password" id="pb" inputmode="numeric" autocomplete="new-password" placeholder="Repeteix el PIN" style="font-size:1.3rem;text-align:center;letter-spacing:.3em;margin-top:10px">
+    <div class="acts"><button class="btn" data-x>Cancel·lar</button><button class="btn pri" data-ok>Desar</button></div>`, d=>{
+    d.querySelector('[data-x]').onclick=()=>d.remove();
+    d.querySelector('[data-ok]').onclick=()=>{ const a=d.querySelector('#pa').value, b=d.querySelector('#pb').value;
+      if(a.length<4) return toast('Mínim 4 caràcters'); if(a!==b) return toast('Els dos PIN no coincideixen');
+      if(first){ work.pin=pinHash(a); d.remove(); enterAdmin(work); toast('PIN creat. Mode organització activat'); }
+      else { S.pin=pinHash(a); save(); d.remove(); toast('PIN canviat. Recorda publicar dades.json'); } };
+    setTimeout(()=>d.querySelector('#pa').focus(),50);
+  });
+}
+function sanitizeSafe(d){ try{ return d ? sanitize(d) : null; }catch(e){ return null; } }
+
 function backupName(){ const d=new Date(); const s=String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0'); return `${s}_Escacs-3Turons.json`; }
 function download(name, obj){ const b=new Blob([JSON.stringify(obj,null,1)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500); toast('Descarregat: '+name); }
 
@@ -813,7 +873,8 @@ const A = {
     save(); render(); toast(`${k} afegits`+(dup?` · ${dup} ja hi eren`:'')); },
   editP:d=>personModal(S.players.find(p=>p.id===d.id)),
 };
-document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el || el.disabled) return; const f=A[el.dataset.act]; if(f){ e.preventDefault(); f(el.dataset, el, e); } });
+const PUBLIC_ACTS = new Set(['go','open','sub','round','menu','project']);
+document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el || el.disabled) return; if(!admin && !PUBLIC_ACTS.has(el.dataset.act)) return; const f=A[el.dataset.act]; if(f){ e.preventDefault(); f(el.dataset, el, e); } });
 document.addEventListener('input',e=>{
   if(e.target.id==='pq'){ ui.q=e.target.value; fillPicker(); }
   if(e.target.id==='ppq'){ ui.pq=e.target.value; fillPeople(); }
@@ -826,13 +887,12 @@ document.addEventListener('keydown',e=>{
 
 /* ---------- 10. ARRENCADA ---------- */
 (async function boot(){
-  S = load();
-  if(S){ try{ S=sanitize(S); }catch(e){ S=null; } }
-  if(!S){ // primera visita: dades publicades al repositori, si n'hi ha
-    try{ const r=await fetch('dades.json',{cache:'no-store'}); if(r.ok) S=sanitize(await r.json()); }catch(e){}
-    if(!S) S=seed();
-    save();
-  }
+  const raw = load();
+  try{ const p = JSON.parse(localStorage.getItem(PREF_KEY)||'null') || (raw&&raw.prefs); if(p) PR=Object.assign(PR,p); }catch(e){}
+  try{ admin = localStorage.getItem(ADM_KEY)==='1'; }catch(e){}
+  applyPrefs(); render();          // pinta de seguida; les dades publicades arriben després
+  if(admin){ S = sanitizeSafe(raw) || await fetchPub() || seed(); save(); }
+  else     { S = await fetchPub() || sanitizeSafe(raw) || seed(); }   // el públic veu sempre la versió publicada
   applyPrefs(); render();
 })();
 </script>
