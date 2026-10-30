@@ -15,7 +15,7 @@ Les dades es guarden en un full de Google. Qui té el PIN pot posar resultats de
 1. Crea un full de càlcul nou a Google Drive.
 2. *Extensions → Apps Script*, enganxa-hi el contingut d'`apps-script.gs` i canvia el `PIN`.
 3. *Implementa → Nova implementació → Aplicació web* — Executa com a: **Jo** · Accés: **Qualsevol persona**.
-4. Copia l'URL acabat en `/exec` i posa'l a `API_URL` dins d'`index.html` (o a la web: *⋮ → Google Sheets*, només per a aquell dispositiu).
+4. Copia l'URL acabat en `/exec` i posa'l a `API_URL` dins d'`index.html` (ja configurat) (o a la web: *⋮ → Google Sheets*, només per a aquell dispositiu).
 
 Si dues persones desen alhora, la web combina els canvis automàticament (resultats i inscripcions).
 
