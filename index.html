@@ -48,6 +48,8 @@ header.top .wrap{display:flex;align-items:center;gap:14px;min-height:92px;positi
 .diamonds i:nth-child(3){background:var(--turq);right:88px;top:-40px}
 .diamonds i:nth-child(4){background:var(--sky);right:132px;top:-6px}
 .adm{display:inline-block;margin-left:10px;vertical-align:middle;background:var(--gold);color:#3b2d00;font-size:.62rem;font-weight:800;letter-spacing:.06em;padding:4px 9px;border-radius:99px}
+.sync{display:inline-block;margin-left:8px;font-size:.62rem;font-weight:800;letter-spacing:.06em;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.14);color:#fff;vertical-align:middle}
+.sync.err{background:var(--coral)}
 .pend{font-size:.85rem;color:var(--muted);font-weight:700}
 .iconbtn{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:1.7rem;color:#fff;background:rgba(255,255,255,.12)}
 .iconbtn:active{background:rgba(255,255,255,.25)}
@@ -220,7 +222,7 @@ table.st tr.out td{opacity:.5}
       <span id="kn" class="knight hidden">♞</span>
       <div style="min-width:0">
         <h1 class="tt">Escacs<span id="admBadge" class="adm hidden">ORGANITZACIÓ</span></h1>
-        <small class="tt">Institut Els 3 Turons · Arenys de Mar</small>
+        <small class="tt">Institut Els 3 Turons · Arenys de Mar<span id="sync" class="sync hidden"></span></small>
       </div>
     </div>
     <button class="iconbtn" data-act="menu" aria-label="Menú">⋮</button>
@@ -246,6 +248,13 @@ table.st tr.out td{opacity:.5}
 const KEY = 'escacs3t_v1';          // dades de treball de l'organització (només aquest navegador)
 const PREF_KEY = 'escacs3t_prefs';   // aspecte (de cada dispositiu)
 const ADM_KEY = 'escacs3t_admin';    // '1' si aquest dispositiu està en mode organització
+const PIN_KEY = 'escacs3t_pin';      // PIN del mode organització (connexió amb Google Sheets)
+const API_KEY = 'escacs3t_api';      // URL de l'script desat en aquest dispositiu (opcional)
+
+/* URL de l'aplicació web d'Apps Script (acaba en /exec). Si és buit, la web funciona
+   en mode local (navegador + dades.json). Vegeu apps-script.gs per configurar-ho. */
+const API_URL = '';
+const POLL_MS = 20000;               // cada quant es comproven canvis d'altres persones
 const PROFESSORAT = ['David Filgaira','Roc Biosca','Manel Jimenez','Oriol Barber','Oriol Berengueres',
   'Alicia Martin','Victor Aguilar','Tomas Martinez','Brian David Saimur','Alberto Bernabeu'];
 
@@ -274,10 +283,59 @@ let PR = {theme:'auto', cb:false, big:false};
 let admin = false;
 const ui = { view:'home', tid:null, sub:null, round:0, q:'', filt:'tots', pq:'', pfilt:'tots' };
 
-function save(){ if(!admin) return; try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ toast('⚠️ No s\'ha pogut desar al navegador'); } }
+function save(){ if(!admin) return; try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ toast('⚠️ No s\'ha pogut desar al navegador'); }
+  if(remote()){ pendingOps.push(curAct); push(); } }
 function savePrefs(){ try{ localStorage.setItem(PREF_KEY, JSON.stringify(PR)); }catch(e){} }
 async function fetchPub(){ try{ const r=await fetch('dades.json?'+Date.now(),{cache:'no-store'}); if(!r.ok) return null; return sanitize(await r.json()); }catch(e){ return null; } }
 function pinHash(s){ let x=5381; for(const c of 'escacs3t:'+s) x=((x<<5)+x+c.charCodeAt(0))|0; return (x>>>0).toString(36); }
+/* ---------- 2b. GOOGLE SHEETS (dades compartides) ---------- */
+let VER = 0, pushing = false, dirty = false, pendingOps = [], curAct = null, online = true;
+function api(){ try{ return localStorage.getItem(API_KEY) || API_URL; }catch(e){ return API_URL; } }
+function remote(){ return !!api(); }
+function getPin(){ try{ return localStorage.getItem(PIN_KEY)||''; }catch(e){ return ''; } }
+async function apiGet(url){ const r = await fetch((url||api())+'?t='+Date.now(), {cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }
+async function apiPost(body, url){ const r = await fetch(url||api(), {method:'POST', body:JSON.stringify(body)}); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }
+function setSync(st){
+  const el=$('#sync'); if(!el) return;
+  if(!remote()){ el.classList.add('hidden'); return; }
+  const txt = {ok: admin?'● DESAT':'● EN DIRECTE', saving:'⟳ DESANT…', off:'⚠ SENSE CONNEXIÓ', conflict:'⟳ COMBINANT…'}[st]||'';
+  el.textContent=txt; el.classList.toggle('hidden', !txt); el.classList.toggle('err', st==='off');
+}
+function strip(d){ const c=JSON.parse(JSON.stringify(d)); delete c.pin; return c; }
+const REPLAYABLE = new Set(['res','enrol','unenrol','withdraw']);
+async function push(){
+  if(pushing){ dirty=true; return; }
+  pushing=true; dirty=false; setSync('saving');
+  const ops = pendingOps; pendingOps = [];
+  try{
+    const r = await apiPost({action:'save', pin:getPin(), base:VER, data:strip(S)});
+    online=true;
+    if(r.ok){ VER=r.ver; setSync('ok'); }
+    else if(r.conflict){
+      // Algú altre ha desat abans: agafem la seva versió i hi tornem a aplicar els nostres canvis
+      setSync('conflict'); S=sanitize(r.data||seed()); VER=r.ver;
+      let lost=false;
+      ops.forEach(op=>{ if(op && REPLAYABLE.has(op.act)){ const prev=curAct; curAct=op; try{ A[op.act](op.d); }catch(e){ lost=true; } curAct=prev; } else lost=true; });
+      if(!ops.some(op=>op&&REPLAYABLE.has(op.act))) render();
+      if(lost) toast('Una altra persona havia fet canvis. S\'han carregat: revisa i torna a fer l\'últim canvi.');
+      else if(!pendingOps.length) setSync('ok');
+    }
+    else if(r.error==='pin'){ admin=false; try{localStorage.removeItem(ADM_KEY);localStorage.removeItem(PIN_KEY);}catch(e){} applyPrefs(); render(); toast('El PIN ha canviat. Torna a entrar al mode organització.'); }
+    else toast('Error en desar: '+(r.error||'desconegut'));
+  }catch(e){ online=false; setSync('off'); pendingOps = ops.concat(pendingOps); dirty=true; setTimeout(()=>{ if(dirty && !pushing) push(); }, 10000); pushing=false; return; }
+  pushing=false;
+  if(dirty || pendingOps.length) push();
+}
+async function poll(){
+  if(!remote() || pushing || dirty || pendingOps.length || document.visibilityState!=='visible') return;
+  if(document.querySelector('#layer .scrim, #layer .sheet')) return;      // hi ha un formulari obert
+  const a=document.activeElement; if(a && /INPUT|TEXTAREA|SELECT/.test(a.tagName)) return;
+  try{ const r=await apiGet(); online=true; setSync('ok');
+    if(r.data && r.ver>VER && !pushing && !dirty){ S=sanitize(r.data); VER=r.ver; if(admin) try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){}
+      if(!$('#layer').children.length) render(); else if(window._fsRedraw) window._fsRedraw(); }
+  }catch(e){ online=false; setSync('off'); }
+}
+
 function load(){ try{ const j = localStorage.getItem(KEY); return j ? JSON.parse(j) : null; }catch(e){ return null; } }
 function P(id){ return S.players.find(p=>p.id===id) || {id, name:'(persona esborrada)', type:'alum', group:''}; }
 function T(id){ return S.tournaments.find(t=>t.id===id); }
@@ -682,9 +740,9 @@ function personModal(p){
 /* ---------- 7. PROJECCIÓ I MODE INSCRIPCIÓ ---------- */
 let fsMode='ron';
 function project(){
-  const t=T(ui.tid); if(!t) return;
+  const tid=ui.tid; if(!T(tid)) return;
   const L=$('#layer'); const d=document.createElement('div'); d.className='fs'; L.appendChild(d);
-  const draw=()=>{
+  const draw=()=>{ const t=T(tid); if(!t){ d.remove(); return; }
     const ri = Math.min(ui.round, t.rounds.length-1), r=t.rounds[ri]||[];
     let n=0, body='';
     if(fsMode==='ron') body = `<div class="fsg">${r.map(g=>{ if(g.b==null) return `<div class="fsgame"><span class="t">–</span><span style="grid-column:2/5">${esc(P(g.w).name)} <span class="vs">descansa</span></span></div>`; n++;
@@ -695,16 +753,17 @@ function project(){
       <button class="btn ${fsMode==='ron'?'on':''}" data-m="ron">Ronda</button><button class="btn ${fsMode==='cla'?'on':''}" data-m="cla">Classificació</button><button class="btn" data-m="x">✕ Sortir</button></div>${body}`;
     d.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{ if(b.dataset.m==='x'){ try{document.exitFullscreen&&document.fullscreenElement&&document.exitFullscreen();}catch(e){} d.remove(); return; } fsMode=b.dataset.m; draw(); });
   };
+  window._fsRedraw=()=>{ if(d.isConnected) draw(); else window._fsRedraw=null; };
   draw(); try{ d.requestFullscreen && d.requestFullscreen(); }catch(e){}
 }
 function kiosk(){
-  const t=T(ui.tid); const L=$('#layer'); const d=document.createElement('div'); d.className='fs'; L.appendChild(d);
+  const tid=ui.tid, t=T(tid); const L=$('#layer'); const d=document.createElement('div'); d.className='fs'; L.appendChild(d);
   d.innerHTML = `<div class="fsbar"><span style="flex:1"></span><button class="btn" data-x>✕ Sortir</button></div>
    <div class="kiosk"><div style="font-size:4rem">♞</div><h2 class="tt">Apunta't!</h2><p style="font-size:1.2rem;color:#CFE0EE">${esc(t.name)}</p>
    <input type="text" id="kN" placeholder="Nom i cognom" autocomplete="off"><input type="text" id="kG" placeholder="Grup (p. ex. 1r MEF)" autocomplete="off" style="margin-top:10px">
    <button class="btn ok" id="kOk">Inscriure'm</button><div class="okmsg" id="kMsg"></div>
    <p style="color:#CFE0EE">Inscrits: <b id="kC">${t.playerIds.length}</b></p></div>`;
-  const go=()=>{ const n=d.querySelector('#kN').value.trim(), g=d.querySelector('#kG').value.trim(); if(n.length<3){ d.querySelector('#kMsg').textContent='Escriu el nom complet'; return; }
+  const go=()=>{ const t=T(tid); if(!t) return; const n=d.querySelector('#kN').value.trim(), g=d.querySelector('#kG').value.trim(); if(n.length<3){ d.querySelector('#kMsg').textContent='Escriu el nom complet'; return; }
     let p = S.players.find(x=>norm(x.name)===norm(n));
     if(!p){ p={id:uid(), name:n, type:'alum', group:g}; S.players.push(p); }
     if(t.playerIds.includes(p.id)){ d.querySelector('#kMsg').textContent=`${p.name}, ja hi eres!`; }
@@ -728,26 +787,60 @@ function openMenu(){
     <button class="mitem" data-p="org"><span class="dia" style="background:var(--gold)"></span><span>Mode organització<small>Canviar el PIN o sortir del mode</small></span></button>
     <button class="mitem" data-p="asp"><span class="dia" style="background:var(--sky)"></span><span>Aspecte<small>Tema, daltònics, mida de lletra</small></span></button>
     <button class="mitem" data-p="bak"><span class="dia" style="background:var(--turq)"></span><span>Còpia de seguretat<small>Exportar i importar dades</small></span></button>
-    <button class="mitem" data-p="web"><span class="dia" style="background:var(--gold)"></span><span>Publicar al web<small>Que tothom vegi els resultats a GitHub</small></span></button>
+    <button class="mitem" data-p="gs"><span class="dia" style="background:var(--turq)"></span><span>Google Sheets<small>${remote()?'Connectat: dades compartides en directe':'Compartir les dades en directe'}</small></span></button>
+    ${remote()?'':`<button class="mitem" data-p="web"><span class="dia" style="background:var(--gold)"></span><span>Publicar al web<small>Que tothom vegi els resultats a GitHub</small></span></button>`}
     <button class="mitem" data-p="del"><span class="dia" style="background:var(--coral)"></span><span>Esborrar-ho tot<small>Tornar a començar de zero</small></span></button>
     <button class="mitem" data-p="about"><span class="dia" style="background:var(--navy)"></span><span>Com funciona<small>Formats, desempats i on es guarden les dades</small></span></button>` : `
     <button class="mitem" data-p="refresh"><span class="dia" style="background:var(--turq)"></span><span>Actualitzar resultats<small>Carregar la darrera versió publicada</small></span></button>
     <button class="mitem" data-p="asp"><span class="dia" style="background:var(--sky)"></span><span>Aspecte<small>Tema, daltònics, mida de lletra</small></span></button>
     <button class="mitem" data-p="about"><span class="dia" style="background:var(--navy)"></span><span>Com funciona<small>Formats i desempats</small></span></button>
     <button class="mitem" data-p="login"><span class="dia" style="background:var(--gold)"></span><span>Mode organització<small>Per gestionar els tornejos (cal PIN)</small></span></button>`, true);
-  main.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>({asp,bak,web,del,about,org,login,refresh})[b.dataset.p]());
+  main.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>({asp,bak,web,del,about,org,login,refresh,gs})[b.dataset.p]());
 
-  async function refresh(){ const d=await fetchPub(); if(!d){ toast('Encara no hi ha dades publicades'); return; } S=d; sh.remove(); render(); toast('Resultats actualitzats'); }
+  async function refresh(){
+    if(remote()){ try{ const r=await apiGet(); if(r.data){ S=sanitize(r.data); VER=r.ver; } sh.remove(); render(); setSync('ok'); toast('Resultats actualitzats'); }catch(e){ toast('Sense connexió'); } return; }
+    const d=await fetchPub(); if(!d){ toast('Encara no hi ha dades publicades'); return; } S=d; sh.remove(); render(); toast('Resultats actualitzats'); }
+  function gs(){
+    const fixed = !!API_URL;
+    const pg=page('Google Sheets', `<div class="pbody">
+      ${remote() ? `<p>✅ <b>Connectat.</b> Els canvis es desen al full de Google i tothom els veu en directe (es comprova cada ${POLL_MS/1000} s).</p>
+        <p class="muted" style="word-break:break-all;font-size:.85rem">${esc(api())}</p>
+        <p class="muted">El PIN es canvia a l'script de Google (línia <b>const PIN</b>) i després cal fer una nova versió de la implementació.</p>
+        ${fixed?'':`<button class="btn warn" style="width:100%" data-dis>Desconnectar aquest dispositiu</button>`}`
+      : `<p>Amb Google Sheets, qualsevol persona amb el PIN pot posar resultats des del seu mòbil i tothom ho veu a l'instant.</p>
+        <p class="muted">Instruccions al fitxer <b>apps-script.gs</b> del repositori.</p>
+        <label class="f">URL de l'aplicació web (acaba en /exec)</label>
+        <input type="text" id="gsUrl" placeholder="https://script.google.com/macros/s/…/exec">
+        <label class="f">PIN de l'script</label>
+        <input type="password" id="gsPin" autocomplete="off">
+        <p class="muted" style="font-size:.88rem">Si el full és buit, s'hi pujaran les dades d'aquest dispositiu.</p>
+        <button class="btn pri" style="width:100%" data-con>Provar i connectar</button>`}</div>`);
+    const dis=pg.querySelector('[data-dis]'); if(dis) dis.onclick=()=>{ try{localStorage.removeItem(API_KEY);}catch(e){} sh.remove(); setSync(); render(); toast('Desconnectat: ara treballes en local'); };
+    const con=pg.querySelector('[data-con]'); if(con) con.onclick=async()=>{
+      const url=pg.querySelector('#gsUrl').value.trim(), pin=pg.querySelector('#gsPin').value;
+      if(!/^https:\/\/script\.google(usercontent)?\.com\/.+/.test(url)) return toast('L\'URL ha de ser de script.google.com');
+      con.disabled=true; con.textContent='Provant…';
+      try{
+        const ck=await apiPost({action:'check', pin}, url); if(!ck.ok){ con.disabled=false; con.textContent='Provar i connectar'; return toast(ck.error==='pin'?'PIN incorrecte':'Error: '+ck.error); }
+        const r=await apiGet(url);
+        try{ localStorage.setItem(API_KEY,url); localStorage.setItem(PIN_KEY,pin); }catch(e){}
+        if(r.data){ S=sanitize(r.data); VER=r.ver; try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} toast('Connectat. Dades del full carregades'); }
+        else { VER=r.ver||0; save(); toast('Connectat. Dades pujades al full'); }
+        sh.remove(); ui.view='home'; setSync('ok'); render();
+      }catch(e){ con.disabled=false; con.textContent='Provar i connectar'; toast('No s\'ha pogut connectar. Revisa l\'URL i que l\'accés sigui «Qualsevol persona».'); }
+    };
+  }
   function login(){ sh.remove(); pinLogin(); }
   function org(){
     const pg=page('Mode organització', `<div class="pbody">
       <p>Aquest dispositiu està en <b>mode organització</b>: pot crear tornejos, inscriure gent i posar resultats. Es manté fins que en surtis.</p>
-      <p class="muted">El PIN evita canvis per error a la vista pública. No és una contrasenya forta: les dades oficials les protegeix GitHub (només qui pot pujar fitxers al repositori publica <b>dades.json</b>).</p>
-      <button class="btn" style="width:100%" data-c>🔑 Canviar el PIN</button>
+      ${remote() ? `<p class="muted">Els canvis es desen al full de Google i tothom els veu en directe. El PIN es canvia a l'script de Google.</p>`
+      : `<p class="muted">El PIN evita canvis per error a la vista pública. No és una contrasenya forta: les dades oficials les protegeix GitHub (només qui pot pujar fitxers al repositori publica <b>dades.json</b>).</p>
+      <button class="btn" style="width:100%" data-c>🔑 Canviar el PIN</button>`}
       <button class="btn warn" style="width:100%;margin-top:12px" data-o>Sortir del mode organització</button></div>`);
-    pg.querySelector('[data-c]').onclick=()=>{ sh.remove(); pinSet(); };
-    pg.querySelector('[data-o]').onclick=async()=>{ admin=false; try{localStorage.removeItem(ADM_KEY);}catch(e){} sh.remove();
-      const d=await fetchPub(); if(d) S=d; ui.view='home'; applyPrefs(); render(); toast('Vista pública. Les teves dades de treball es conserven.'); };
+    const pc=pg.querySelector('[data-c]'); if(pc) pc.onclick=()=>{ sh.remove(); pinSet(); };
+    pg.querySelector('[data-o]').onclick=async()=>{ admin=false; try{localStorage.removeItem(ADM_KEY); if(remote()) localStorage.removeItem(PIN_KEY);}catch(e){} sh.remove();
+      if(!remote()){ const d=await fetchPub(); if(d) S=d; } ui.view='home'; applyPrefs(); render(); setSync('ok'); toast(remote()?'Vista pública':'Vista pública. Les teves dades de treball es conserven.'); };
   }
 
   function asp(){
@@ -762,7 +855,7 @@ function openMenu(){
   }
   function bak(){
     const pg=page('Còpia de seguretat', `<div class="pbody">
-      <p>Les dades es guarden <b>en aquest navegador</b>. Fes una còpia de tant en tant i sempre abans de canviar d'ordinador.</p>
+      <p>${remote()?'Les dades són al full de Google. Una còpia en fitxer va bé per guardar l\'estat d\'un torneig acabat o per si de cas.':'Les dades es guarden <b>en aquest navegador</b>. Fes una còpia de tant en tant i sempre abans de canviar d\'ordinador.'}</p>
       <button class="btn pri" style="width:100%" data-e>⬇ Exportar còpia (.json)</button>
       <p style="margin-top:22px">Importar una còpia <b>substitueix</b> totes les dades actuals.</p>
       <input type="file" id="impF" accept=".json,application/json" class="hidden">
@@ -787,7 +880,7 @@ function openMenu(){
       slideConfirm('Carregar dades publicades', 'Les dades d\'aquest navegador se substituiran per les publicades.', 'Llisca per carregar', ()=>{ d.pin=d.pin||S.pin; S=d; save(); ui.view='home'; sh.remove(); render(); toast('Dades publicades carregades'); }); };
   }
   function del(){
-    slideConfirm('Esborrar-ho tot', 'S\'esborraran tots els tornejos i persones d\'aquest navegador. Es tornarà a carregar la llista inicial del professorat.', 'Llisca per esborrar', ()=>{ const pin=S.pin; S=seed(); S.pin=pin; save(); ui.view='home'; sh.remove(); render(); toast('Tot esborrat'); });
+    slideConfirm('Esborrar-ho tot', (remote()?'S\'esborraran tots els tornejos i persones <b>per a tothom</b> (full de Google).':'S\'esborraran tots els tornejos i persones d\'aquest navegador.')+' Es tornarà a carregar la llista inicial del professorat.', 'Llisca per esborrar', ()=>{ const pin=S.pin; S=seed(); S.pin=pin; save(); ui.view='home'; sh.remove(); render(); toast('Tot esborrat'); });
   }
   function about(){
     page('Com funciona', `<div class="pbody">
@@ -795,13 +888,15 @@ function openMenu(){
       <p><b>Lliga:</b> tothom contra tothom. Les rondes es generen totes de cop. Si són senars, cada ronda descansa algú (0 punts, i tothom descansa una vegada).</p>
       <p><b>Desempats:</b> Buchholz al suís (suma de punts dels rivals) i Sonneborn-Berger a la lliga.</p>
       <p><b>Colors:</b> el programa alterna blanques ♔ i negres ♚ per equilibrar.</p>
-      <p><b>Dades:</b> la vista pública mostra sempre la darrera versió publicada (<b>dades.json</b>). El mode organització treballa amb una còpia al navegador d'aquest dispositiu: fes còpies i publica <b>dades.json</b> perquè la resta ho vegi.</p>
+      ${remote()?'<p><b>Dades:</b> es guarden en un full de Google. Qui té el PIN pot posar resultats des de qualsevol dispositiu, i la resta ho veu en directe.</p>':''}
+      <p style="${remote()?'display:none':''}"><b>Dades:</b> la vista pública mostra sempre la darrera versió publicada (<b>dades.json</b>). El mode organització treballa amb una còpia al navegador d'aquest dispositiu: fes còpies i publica <b>dades.json</b> perquè la resta ho vegi.</p>
       <p class="muted">Institut Els 3 Turons · Arenys de Mar</p></div>`);
   }
 }
 /* ---------- 8b. PIN DEL MODE ORGANITZACIÓ ---------- */
 function enterAdmin(work){ S=work; admin=true; try{localStorage.setItem(ADM_KEY,'1');}catch(e){} save(); ui.view='home'; applyPrefs(); render(); }
 function pinLogin(){
+  if(remote()) return pinLoginRemote();
   const work = sanitizeSafe(load()) || S;   // la còpia de treball d'aquest dispositiu, si n'hi ha
   if(!work.pin){ pinSet(work); return; }
   modal(`<h3 class="tt">Mode organització</h3><p class="muted">Escriu el PIN per gestionar els tornejos.</p>
@@ -809,6 +904,23 @@ function pinLogin(){
     <div class="acts"><button class="btn" data-x>Cancel·lar</button><button class="btn pri" data-ok>Entrar</button></div>`, d=>{
     const go=()=>{ const v=d.querySelector('#pin1').value; if(pinHash(v)===work.pin){ d.remove(); enterAdmin(work); toast('Mode organització activat'); } else { d.querySelector('#pin1').value=''; toast('PIN incorrecte'); } };
     d.querySelector('[data-x]').onclick=()=>d.remove(); d.querySelector('[data-ok]').onclick=go;
+    d.querySelector('#pin1').addEventListener('keydown',e=>{ if(e.key==='Enter') go(); });
+    setTimeout(()=>d.querySelector('#pin1').focus(),50);
+  });
+}
+function pinLoginRemote(){
+  modal(`<h3 class="tt">Mode organització</h3><p class="muted">Escriu el PIN per gestionar els tornejos.</p>
+    <input type="password" id="pin1" inputmode="numeric" autocomplete="off" placeholder="PIN" style="font-size:1.4rem;text-align:center;letter-spacing:.3em">
+    <div class="acts"><button class="btn" data-x>Cancel·lar</button><button class="btn pri" data-ok>Entrar</button></div>`, d=>{
+    const ok=d.querySelector('[data-ok]');
+    const go=async()=>{ const v=d.querySelector('#pin1').value; ok.disabled=true;
+      try{ const r=await apiPost({action:'check', pin:v});
+        if(r.ok){ try{localStorage.setItem(PIN_KEY,v);}catch(e){} d.remove(); admin=true; try{localStorage.setItem(ADM_KEY,'1');}catch(e){}
+          ui.view='home'; applyPrefs(); setSync('ok'); render(); toast('Mode organització activat'); }
+        else { d.querySelector('#pin1').value=''; toast('PIN incorrecte'); }
+      }catch(e){ toast('Sense connexió amb el full de Google'); }
+      ok.disabled=false; };
+    d.querySelector('[data-x]').onclick=()=>d.remove(); ok.onclick=go;
     d.querySelector('#pin1').addEventListener('keydown',e=>{ if(e.key==='Enter') go(); });
     setTimeout(()=>d.querySelector('#pin1').focus(),50);
   });
@@ -848,13 +960,14 @@ const A = {
     else { if(!t.nRounds) t.nRounds=suggestRounds(t.playerIds.length); t.rounds=[swissRound(t)]; }
     t.status='enjoc'; ui.sub='ron'; ui.round=0; save(); render(); toast('Torneig començat! Bona partida ♟'); },
   nextRound:()=>{ const t=T(ui.tid); t.rounds.push(swissRound(t)); ui.round=t.rounds.length-1; save(); render(); toast('Ronda '+t.rounds.length+' generada'); },
-  res:d=>{ const t=T(ui.tid); const g=t.rounds[ui.round][+d.g]; g.res = g.res===d.v ? null : d.v; save(); render();
-    if(roundDone(t.rounds[ui.round]) && g.res) toast('Ronda '+(ui.round+1)+' completa ✓'); },
+  res:d=>{ const t=T(d.tid||ui.tid); const ri = d.ri!==undefined ? +d.ri : ui.round; const g=t&&t.rounds[ri]&&t.rounds[ri][+d.g]; if(!g) return;
+    if(d.set===undefined) d.set = g.res===d.v ? '' : d.v; d.tid=t.id; d.ri=ri; g.res = d.set||null; save(); render();
+    if(ri===ui.round && roundDone(t.rounds[ri]) && g.res && !curAct?.replayed) toast('Ronda '+(ui.round+1)+' completa ✓'); },
   finish:()=>{ const t=T(ui.tid); t.status='acabat'; ui.sub='cla'; save(); render(); toast('🏆 Guanyador/a: '+P(standings(t)[0].id).name); },
   reopen:()=>{ const t=T(ui.tid); t.status='enjoc'; save(); render(); },
-  enrol:d=>{ const t=T(ui.tid); if(!t.playerIds.includes(d.id)) t.playerIds.push(d.id); save(); render(); },
-  unenrol:d=>{ const t=T(ui.tid); t.playerIds=t.playerIds.filter(x=>x!==d.id); save(); render(); },
-  withdraw:d=>{ const t=T(ui.tid); t.out = t.out.includes(d.id) ? t.out.filter(x=>x!==d.id) : [...t.out, d.id]; save(); render(); },
+  enrol:d=>{ d.tid=d.tid||ui.tid; const t=T(d.tid); if(!t) return; if(!t.playerIds.includes(d.id)) t.playerIds.push(d.id); save(); render(); },
+  unenrol:d=>{ d.tid=d.tid||ui.tid; const t=T(d.tid); if(!t) return; t.playerIds=t.playerIds.filter(x=>x!==d.id); save(); render(); },
+  withdraw:d=>{ d.tid=d.tid||ui.tid; const t=T(d.tid); if(!t) return; if(d.set===undefined) d.set = t.out.includes(d.id)?'in':'out'; t.out = d.set==='in' ? t.out.filter(x=>x!==d.id) : [...t.out.filter(x=>x!==d.id), d.id]; save(); render(); },
   enrolAll:()=>{ const t=T(ui.tid); const l=pickerList(t); if(!l.length) return; l.forEach(p=>t.playerIds.push(p.id)); save(); render(); toast(l.length+' inscrits'); },
   filt:d=>{ ui.filt=d.v; render(); },
   pfilt:d=>{ ui.pfilt=d.v; render(); },
@@ -874,7 +987,7 @@ const A = {
   editP:d=>personModal(S.players.find(p=>p.id===d.id)),
 };
 const PUBLIC_ACTS = new Set(['go','open','sub','round','menu','project']);
-document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el || el.disabled) return; if(!admin && !PUBLIC_ACTS.has(el.dataset.act)) return; const f=A[el.dataset.act]; if(f){ e.preventDefault(); f(el.dataset, el, e); } });
+document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el || el.disabled) return; if(!admin && !PUBLIC_ACTS.has(el.dataset.act)) return; const f=A[el.dataset.act]; if(f){ e.preventDefault(); const d={...el.dataset}; curAct={act:el.dataset.act, d}; try{ f(d, el, e); } finally { curAct=null; } } });
 document.addEventListener('input',e=>{
   if(e.target.id==='pq'){ ui.q=e.target.value; fillPicker(); }
   if(e.target.id==='ppq'){ ui.pq=e.target.value; fillPeople(); }
@@ -891,7 +1004,19 @@ document.addEventListener('keydown',e=>{
   try{ const p = JSON.parse(localStorage.getItem(PREF_KEY)||'null') || (raw&&raw.prefs); if(p) PR=Object.assign(PR,p); }catch(e){}
   try{ admin = localStorage.getItem(ADM_KEY)==='1'; }catch(e){}
   applyPrefs(); render();          // pinta de seguida; les dades publicades arriben després
-  if(admin){ S = sanitizeSafe(raw) || await fetchPub() || seed(); save(); }
+  if(remote()){
+    try{
+      const r = await apiGet(); VER = r.ver||0;
+      if(r.data) S = sanitize(r.data);
+      else { S = sanitizeSafe(raw) || await fetchPub() || seed(); if(admin && getPin()) save(); }   // full buit: s'hi pugen les dades
+      if(admin) try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){}
+      setSync('ok');
+    }catch(e){ S = sanitizeSafe(raw) || await fetchPub() || seed(); setSync('off'); toast('Sense connexió: es mostren les darreres dades guardades'); }
+    if(admin && !getPin()){ admin=false; try{localStorage.removeItem(ADM_KEY);}catch(e){} }
+    setInterval(poll, POLL_MS);
+    document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') poll(); });
+  }
+  else if(admin){ S = sanitizeSafe(raw) || await fetchPub() || seed(); save(); }
   else     { S = await fetchPub() || sanitizeSafe(raw) || seed(); }   // el públic veu sempre la versió publicada
   applyPrefs(); render();
 })();
