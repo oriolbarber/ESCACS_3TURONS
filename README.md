@@ -22,8 +22,12 @@ Si dues persones desen alhora, la web combina els canvis automàticament (result
 ## Sense Google Sheets (mode local)
 Si `API_URL` és buit, les dades es guarden al navegador de l'organització i es publiquen pujant `dades.json` al repositori (*⋮ → Publicar al web*).
 
+## Instal·lar com a app
+Al mòbil: *⋮ → Instal·lar l'app* (o el botó de l'inici). Funciona com una app i s'obre sense connexió amb les darreres dades vistes.
+
 ## Fitxers
 - `index.html` — l'aplicació (un sol fitxer, sense dependències).
+- `manifest.json`, `sw.js`, `icon-*.png`, `apple-touch-icon.png` — app instal·lable i funcionament sense connexió.
 - `apps-script.gs` — codi per al full de Google.
 - `dades.json` — (opcional, mode local) dades publicades.
 - `logo.png` — logotip del centre en blanc (ja va incrustat a `index.html`).
