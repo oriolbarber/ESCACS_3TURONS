@@ -1,7 +1,7 @@
 /* Escacs 3 Turons — service worker
    Primer la xarxa (així sempre es veu la versió nova) i, sense connexió, la còpia guardada.
    Les dades del full de Google i les fonts no passen per aquí. */
-const CACHE = 'escacs3t-v1';
+const CACHE = 'escacs3t-v2';
 const APP = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png'];
 
 self.addEventListener('install', e => {
