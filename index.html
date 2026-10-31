@@ -69,13 +69,8 @@ nav.tabs button.on{color:#fff;border-color:var(--gold)}
   .adm{font-size:.55rem;padding:3px 7px;margin-left:2px}
   .iconbtn{width:46px;height:46px;font-size:1.5rem}
   nav.tabs .wrap{gap:0}
-  nav.tabs button{padding:12px 11px;font-size:.82rem;letter-spacing:.03em;min-height:48px}
+  nav.tabs button{padding:12px 9px;font-size:.78rem;letter-spacing:.02em;min-height:48px}
   .cnt{min-width:18px;height:18px;font-size:.68rem;margin-left:4px}
-  main{padding-top:14px}
-  h2.sec{font-size:1.15rem}
-  .subtabs{gap:0}
-  .subtabs button{padding:10px 9px;font-size:.78rem;letter-spacing:.02em}
-  .thead{margin-bottom:4px}
 }
 
 /* ============ 4. COMPONENTS ============ */
@@ -234,6 +229,17 @@ table.st tr.out td{opacity:.5}
 .kiosk input{font-size:1.4rem;min-height:64px;text-align:center;background:#fff;color:#13213A}
 .kiosk .btn{min-height:66px;font-size:1.3rem;width:100%;margin-top:14px}
 .kiosk .okmsg{font-size:1.6rem;font-weight:800;color:var(--gold);min-height:2.2em;margin-top:18px}
+
+/* ============ 7. AJUSTOS DE MÒBIL (al final perquè guanyin) ============ */
+@media (max-width:620px){
+  main{padding:14px 0 80px}
+  h2.sec{font-size:1.15rem}
+  .subtabs{gap:0}
+  .subtabs button{padding:10px 8px;font-size:.78rem;letter-spacing:.02em;flex:1 1 auto;min-height:46px}
+  .subtabs .sn{display:none}
+  .thead{margin-bottom:4px}
+  .games{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -614,7 +620,7 @@ function vTour(t){
     const allDone = t.rounds.length && t.rounds.every(roundDone) && t.rounds.length>=totalRounds(t);
     if(allDone) actions = `<button class="btn ok" data-act="finish">🏆 Tancar torneig</button>`;
   } else actions = `<button class="btn sm" data-act="reopen">Reobrir</button>`;
-  const tabs = [['ron','Rondes'],['cla','Classificació'],['jug','Participants ('+t.playerIds.length+')']];
+  const tabs = [['ron','Rondes'],['cla','Classificació'],['jug','Participants<span class="sn"> ('+t.playerIds.length+')</span>']];
   return `
   <div class="thead">
     <button class="back" data-act="go" data-v="home">‹ Tornejos</button>
