@@ -25,7 +25,7 @@
 /* ============ 2. BASE ============ */
 *{box-sizing:border-box}
 html{font-size:var(--fs);-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,Helvetica,sans-serif;line-height:1.35;min-height:100vh}
+body{overflow-x:clip;margin:0;background:var(--bg);color:var(--ink);font-family:Arial,Helvetica,sans-serif;line-height:1.35;min-height:100vh}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer;border:0;background:none}
 .tt{text-transform:uppercase;letter-spacing:.02em}
@@ -54,15 +54,28 @@ header.top .wrap{display:flex;align-items:center;gap:14px;min-height:92px;positi
 .iconbtn{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-size:1.7rem;color:#fff;background:var(--navy);border:2px solid rgba(255,255,255,.5);flex:none}
 .iconbtn:active{background:#2b5596}
 nav.tabs{background:var(--navy);border-top:1px solid rgba(255,255,255,.12)}
-nav.tabs .wrap{display:flex;gap:4px}
-nav.tabs button{color:#CFE0EE;padding:14px 18px;font-weight:700;letter-spacing:.06em;border-bottom:4px solid transparent;min-height:52px}
+nav.tabs .wrap{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+nav.tabs .wrap::-webkit-scrollbar{display:none}
+nav.tabs button{white-space:nowrap;flex:none;color:#CFE0EE;padding:14px 18px;font-weight:700;letter-spacing:.06em;border-bottom:4px solid transparent;min-height:52px}
 nav.tabs button.on{color:#fff;border-color:var(--gold)}
 @media (max-width:620px){
-  .board{width:38vw;background-size:30px 30px}
-  .brand .logo{height:46px}
-  .brand h1{font-size:1.3rem}
+  header.top .wrap{min-height:72px;gap:10px}
+  .board{width:34vw;background-size:24px 24px}
+  .brand{gap:10px}
+  .brand .logo{height:40px}
+  .brand h1{font-size:1.2rem;gap:4px}
   .brandtxt{padding-left:10px}
-  .brand small{font-size:.62rem}
+  .brand small{font-size:.6rem}
+  .adm{font-size:.55rem;padding:3px 7px;margin-left:2px}
+  .iconbtn{width:46px;height:46px;font-size:1.5rem}
+  nav.tabs .wrap{gap:0}
+  nav.tabs button{padding:12px 11px;font-size:.82rem;letter-spacing:.03em;min-height:48px}
+  .cnt{min-width:18px;height:18px;font-size:.68rem;margin-left:4px}
+  main{padding-top:14px}
+  h2.sec{font-size:1.15rem}
+  .subtabs{gap:0}
+  .subtabs button{padding:10px 9px;font-size:.78rem;letter-spacing:.02em}
+  .thead{margin-bottom:4px}
 }
 
 /* ============ 4. COMPONENTS ============ */
@@ -918,7 +931,7 @@ function openMenu(){
         <label class="f">URL de l'aplicació web (acaba en /exec)</label>
         <input type="text" id="gsUrl" placeholder="https://script.google.com/macros/s/…/exec">
         <label class="f">PIN de l'script</label>
-        <input type="password" id="gsPin" autocomplete="off">
+        <input type="password" id="gsPin" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false">
         <p class="muted" style="font-size:.88rem">Si el full és buit, s'hi pujaran les dades d'aquest dispositiu.</p>
         <button class="btn pri" style="width:100%" data-con>Provar i connectar</button>`}</div>`);
     const dis=pg.querySelector('[data-dis]'); if(dis) dis.onclick=()=>{ try{localStorage.removeItem(API_KEY);}catch(e){} sh.remove(); setSync(); render(); toast('Desconnectat: ara treballes en local'); };
@@ -1005,8 +1018,9 @@ function pinLogin(){
   if(remote()) return pinLoginRemote();
   const work = sanitizeSafe(load()) || S;   // la còpia de treball d'aquest dispositiu, si n'hi ha
   if(!work.pin){ pinSet(work); return; }
-  modal(`<h3 class="tt">Mode organització</h3><p class="muted">Escriu el PIN per gestionar els tornejos.</p>
-    <input type="password" id="pin1" inputmode="numeric" autocomplete="off" placeholder="PIN" style="font-size:1.4rem;text-align:center;letter-spacing:.3em">
+  modal(`<h3 class="tt">Mode organització</h3><p class="muted">Escriu el PIN (pot tenir lletres i números).</p>
+    <input type="password" id="pin1" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="PIN" style="font-size:1.4rem;text-align:center;letter-spacing:.1em">
+    <label style="display:flex;gap:8px;align-items:center;margin-top:10px;font-size:.9rem" class="muted"><input type="checkbox" id="pinShow" style="width:20px;height:20px"> Mostra el PIN</label>
     <div class="acts"><button class="btn" data-x>Cancel·lar</button><button class="btn pri" data-ok>Entrar</button></div>`, d=>{
     const go=()=>{ const v=d.querySelector('#pin1').value; if(pinHash(v)===work.pin){ d.remove(); enterAdmin(work); toast('Mode organització activat'); } else { d.querySelector('#pin1').value=''; toast('PIN incorrecte'); } };
     d.querySelector('[data-x]').onclick=()=>d.remove(); d.querySelector('[data-ok]').onclick=go;
@@ -1015,8 +1029,9 @@ function pinLogin(){
   });
 }
 function pinLoginRemote(){
-  modal(`<h3 class="tt">Mode organització</h3><p class="muted">Escriu el PIN per gestionar els tornejos.</p>
-    <input type="password" id="pin1" inputmode="numeric" autocomplete="off" placeholder="PIN" style="font-size:1.4rem;text-align:center;letter-spacing:.3em">
+  modal(`<h3 class="tt">Mode organització</h3><p class="muted">Escriu el PIN (pot tenir lletres i números).</p>
+    <input type="password" id="pin1" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="PIN" style="font-size:1.4rem;text-align:center;letter-spacing:.1em">
+    <label style="display:flex;gap:8px;align-items:center;margin-top:10px;font-size:.9rem" class="muted"><input type="checkbox" id="pinShow" style="width:20px;height:20px"> Mostra el PIN</label>
     <div class="acts"><button class="btn" data-x>Cancel·lar</button><button class="btn pri" data-ok>Entrar</button></div>`, d=>{
     const ok=d.querySelector('[data-ok]');
     const go=async()=>{ const v=d.querySelector('#pin1').value; ok.disabled=true;
@@ -1033,9 +1048,9 @@ function pinLoginRemote(){
 }
 function pinSet(work){
   const first = !!work;
-  modal(`<h3 class="tt">${first?'Crea un PIN':'Canviar el PIN'}</h3><p class="muted">${first?'Encara no hi ha PIN. Tria\'n un per entrar al mode organització (mínim 4 caràcters).':'Escriu el PIN nou dues vegades.'}</p>
-    <input type="password" id="pa" inputmode="numeric" autocomplete="new-password" placeholder="PIN nou" style="font-size:1.3rem;text-align:center;letter-spacing:.3em">
-    <input type="password" id="pb" inputmode="numeric" autocomplete="new-password" placeholder="Repeteix el PIN" style="font-size:1.3rem;text-align:center;letter-spacing:.3em;margin-top:10px">
+  modal(`<h3 class="tt">${first?'Crea un PIN':'Canviar el PIN'}</h3><p class="muted">${first?'Encara no hi ha PIN. Tria\'n un per entrar al mode organització (mínim 4 caràcters, lletres o números).':'Escriu el PIN nou dues vegades.'}</p>
+    <input type="password" id="pa" autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="PIN nou" style="font-size:1.3rem;text-align:center;letter-spacing:.3em">
+    <input type="password" id="pb" autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="Repeteix el PIN" style="font-size:1.3rem;text-align:center;letter-spacing:.3em;margin-top:10px">
     <div class="acts"><button class="btn" data-x>Cancel·lar</button><button class="btn pri" data-ok>Desar</button></div>`, d=>{
     d.querySelector('[data-x]').onclick=()=>d.remove();
     d.querySelector('[data-ok]').onclick=()=>{ const a=d.querySelector('#pa').value, b=d.querySelector('#pb').value;
@@ -1102,6 +1117,7 @@ const A = {
 };
 const PUBLIC_ACTS = new Set(['go','open','sub','round','menu','project','signup']);
 document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el || el.disabled) return; if(!admin && !PUBLIC_ACTS.has(el.dataset.act)) return; const f=A[el.dataset.act]; if(f){ e.preventDefault(); const d={...el.dataset}; curAct={act:el.dataset.act, d}; try{ f(d, el, e); } finally { curAct=null; } } });
+document.addEventListener('change',e=>{ if(e.target.id==='pinShow'){ const i=document.getElementById('pin1'); if(i) i.type=e.target.checked?'text':'password'; } });
 document.addEventListener('input',e=>{
   if(e.target.id==='pq'){ ui.q=e.target.value; fillPicker(); }
   if(e.target.id==='ppq'){ ui.pq=e.target.value; fillPeople(); }
