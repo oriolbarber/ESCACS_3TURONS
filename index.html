@@ -212,6 +212,52 @@ button.prow3:hover{background:color-mix(in srgb,var(--pri) 5%,transparent)}
 .byeline{margin:10px 4px 0;font-size:.85rem;color:var(--muted)}
 .byeline b{color:var(--ink)}
 
+/* Partida online · peces: Colin M. L. Burnett (BSD) */
+.rp.onl{background:transparent;color:var(--pri);border:1.5px solid var(--gold);font-size:.75rem;font-family:var(--fb)}
+.sheet.gv{z-index:45;overflow:auto;background:var(--bg)}
+.gbody{max-width:560px;margin:0 auto;padding:12px 16px calc(30px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px}
+.gpl{display:flex;align-items:center;gap:8px;min-height:36px;padding:4px 6px;border-radius:10px}
+.gpl b{font-size:.95rem}
+.gpl.turn{background:color-mix(in srgb,var(--gold) 22%,transparent)}
+.tdot{width:10px;height:10px;border-radius:50%;background:var(--gold);margin-left:auto}
+.bwrap{position:relative}
+.board{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));aspect-ratio:1;width:100%;border-radius:6px;overflow:hidden;box-shadow:0 2px 10px rgba(19,33,58,.25);user-select:none;touch-action:manipulation}
+.sq{position:relative;padding:0;border:0;display:block;aspect-ratio:1}
+.sq.l{background:#E6ECF3} .sq.d{background:#8EA6C8}
+.sq.last.l{background:#F3E39A} .sq.last.d{background:#D2BC5C}
+.sq.sel{box-shadow:inset 0 0 0 4px var(--gold)}
+.sq.chk{background:radial-gradient(circle,#ff4d4d 0,#e5533d 35%,transparent 75%)!important}
+.sq .pc{position:absolute;inset:4%;background-size:contain;background-repeat:no-repeat;background-position:center}
+.sq .dot{position:absolute;left:36%;top:36%;width:28%;height:28%;border-radius:50%;background:rgba(19,33,58,.32)}
+.sq .cap{position:absolute;inset:3%;border-radius:50%;box-shadow:inset 0 0 0 4px rgba(19,33,58,.35)}
+.sq .cf,.sq .cr{position:absolute;font-family:var(--fd);font-weight:700;font-size:.6rem;line-height:1;pointer-events:none}
+.sq .cf{right:3px;bottom:2px} .sq .cr{left:3px;top:3px}
+.sq.l .cf,.sq.l .cr{color:#6F86A8} .sq.d .cf,.sq.d .cr{color:#EEF2F8}
+.promo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--card);border-radius:14px;padding:10px;display:flex;gap:6px;align-items:center;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.promo span{font-weight:700;font-size:.85rem;margin-right:4px}
+.promo button{width:54px;height:54px;border-radius:10px;background:var(--soft);position:relative}
+.promo .pc{position:absolute;inset:6%;background-size:contain;background-repeat:no-repeat}
+.gstatus{margin:2px 4px;font-size:.92rem}
+.gconfirm{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:color-mix(in srgb,var(--gold) 18%,var(--card));border:1px solid var(--gold);border-radius:14px;padding:10px 12px}
+.gconfirm span{flex:1;min-width:120px}
+.gacts{display:flex;gap:8px;flex-wrap:wrap}
+.gacts .btn{flex:1 1 auto}
+.gjoin .two .btn{gap:8px}
+.mlist{display:grid;grid-template-columns:2.4em 6em 6em;gap:4px 8px;font-variant-numeric:tabular-nums;font-size:.92rem;padding:4px 2px}
+.mlist .mn{color:var(--muted)}
+.pc.wp{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PHBhdGggZD0iTTIyLjUgOWMtMi4yMSAwLTQgMS43OS00IDQgMCAuODkuMjkgMS43MS43OCAyLjM4QzE3LjMzIDE2LjUgMTYgMTguNTkgMTYgMjFjMCAyLjAzLjk0IDMuODQgMi40MSA1LjAzLTMgMS4wNi03LjQxIDUuNTUtNy40MSAxMy40N2gyM2MwLTcuOTItNC40MS0xMi40MS03LjQxLTEzLjQ3IDEuNDctMS4xOSAyLjQxLTMgMi40MS01LjAzIDAtMi40MS0xLjMzLTQuNS0zLjI4LTUuNjIuNDktLjY3Ljc4LTEuNDkuNzgtMi4zOCAwLTIuMjEtMS43OS00LTQtNHoiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==')}
+.pc.wb{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxnIGZpbGw9IiNmZmYiIHN0cm9rZS1saW5lY2FwPSJidXR0Ij48cGF0aCBkPSJNOSAzNmMzLjM5LS45NyAxMC4xMS40MyAxMy41LTIgMy4zOSAyLjQzIDEwLjExIDEuMDMgMTMuNSAyIDAgMCAxLjY1LjU0IDMgMi0uNjguOTctMS42NS45OS0zIC41LTMuMzktLjk3LTEwLjExLjQ2LTEzLjUtMS0zLjM5IDEuNDYtMTAuMTEuMDMtMTMuNSAxLTEuMzU0LjQ5LTIuMzIzLjQ3LTMtLjUgMS4zNTQtMS45NCAzLTIgMy0yeiIvPjxwYXRoIGQ9Ik0xNSAzMmMyLjUgMi41IDEyLjUgMi41IDE1IDAgLjUtMS41IDAtMiAwLTIgMC0yLjUtMi41LTQtMi41LTQgNS41LTEuNSA2LTExLjUtNS0xNS41LTExIDQtMTAuNSAxNC01IDE1LjUgMCAwLTIuNSAxLjUtMi41IDQgMCAwLS41LjUgMCAyeiIvPjxwYXRoIGQ9Ik0yNSA4YTIuNSAyLjUgMCAxIDEtNSAwIDIuNSAyLjUgMCAxIDEgNSAweiIvPjwvZz48cGF0aCBkPSJNMTcuNSAyNmgxME0xNSAzMGgxNW0tNy41LTE0LjV2NU0yMCAxOGg1IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PC9nPjwvc3ZnPg==')}
+.pc.wn{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxMGMxMC41IDEgMTYuNSA4IDE2IDI5SDE1YzAtOSAxMC02LjUgOC0yMSIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yNCAxOGMuMzggMi45MS01LjU1IDcuMzctOCA5LTMgMi0yLjgyIDQuMzQtNSA0LTEuMDQyLS45NCAxLjQxLTMuMDQgMC0zLTEgMCAuMTkgMS4yMy0xIDItMSAwLTQuMDAzIDEtNC00IDAtMiA2LTEyIDYtMTJzMS44OS0xLjkgMi0zLjVjLS43My0uOTk0LS41LTItLjUtMyAxLTEgMyAyLjUgMyAyLjVoMnMuNzgtMS45OTIgMi41LTNjMSAwIDEgMyAxIDMiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNOS41IDI1LjVhLjUuNSAwIDEgMS0xIDAgLjUuNSAwIDEgMSAxIDB6bTUuNDMzLTkuNzVhLjUgMS41IDMwIDEgMS0uODY2LS41LjUgMS41IDMwIDEgMSAuODY2LjV6IiBmaWxsPSIjMDAwIi8+PC9nPjwvc3ZnPg==')}
+.pc.wr{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0iI2ZmZiIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik05IDM5aDI3di0zSDl2M3ptMy0zdi00aDIxdjRIMTJ6bS0xLTIyVjloNHYyaDVWOWg1djJoNVY5aDR2NSIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiLz48cGF0aCBkPSJNMzQgMTRsLTMgM0gxNGwtMy0zIi8+PHBhdGggZD0iTTMxIDE3djEyLjVIMTRWMTciIHN0cm9rZS1saW5lY2FwPSJidXR0IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PHBhdGggZD0iTTMxIDI5LjVsMS41IDIuNWgtMjBsMS41LTIuNSIvPjxwYXRoIGQ9Ik0xMSAxNGgyMyIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIvPjwvZz48L3N2Zz4=')}
+.pc.wq{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0iI2ZmZiIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik04IDEyYTIgMiAwIDEgMS00IDAgMiAyIDAgMSAxIDQgMHptMTYuNS00LjVhMiAyIDAgMSAxLTQgMCAyIDIgMCAxIDEgNCAwek00MSAxMmEyIDIgMCAxIDEtNCAwIDIgMiAwIDEgMSA0IDB6TTE2IDguNWEyIDIgMCAxIDEtNCAwIDIgMiAwIDEgMSA0IDB6TTMzIDlhMiAyIDAgMSAxLTQgMCAyIDIgMCAxIDEgNCAweiIvPjxwYXRoIGQ9Ik05IDI2YzguNS0xLjUgMjEtMS41IDI3IDBsMi0xMi03IDExVjExbC01LjUgMTMuNS0zLTE1LTMgMTUtNS41LTE0VjI1TDcgMTRsMiAxMnoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTkgMjZjMCAyIDEuNSAyIDIuNSA0IDEgMS41IDEgMSAuNSAzLjUtMS41IDEtMS41IDIuNS0xLjUgMi41LTEuNSAxLjUuNSAyLjUuNSAyLjUgNi41IDEgMTYuNSAxIDIzIDAgMCAwIDEuNS0xIDAtMi41IDAgMCAuNS0xLjUtMS0yLjUtLjUtMi41LS41LTIgLjUtMy41IDEtMiAyLjUtMiAyLjUtNC04LjUtMS41LTE4LjUtMS41LTI3IDB6IiBzdHJva2UtbGluZWNhcD0iYnV0dCIvPjxwYXRoIGQ9Ik0xMS41IDMwYzMuNS0xIDE4LjUtMSAyMiAwTTEyIDMzLjVjNi0xIDE1LTEgMjEgMCIgZmlsbD0ibm9uZSIvPjwvZz48L3N2Zz4=')}
+.pc.wk{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMi41IDExLjYzVjZNMjAgOGg1IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PHBhdGggZD0iTTIyLjUgMjVzNC41LTcuNSAzLTEwLjVjMCAwLTEtMi41LTMtMi41cy0zIDIuNS0zIDIuNWMtMS41IDMgMyAxMC41IDMgMTAuNSIgZmlsbD0iI2ZmZiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48cGF0aCBkPSJNMTEuNSAzN2M1LjUgMy41IDE1LjUgMy41IDIxIDB2LTdzOS00LjUgNi0xMC41Yy00LTYuNS0xMy41LTMuNS0xNiA0VjI3di0zLjVjLTMuNS03LjUtMTMtMTAuNS0xNi00LTMgNiA1IDEwIDUgMTBWMzd6IiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTExLjUgMzBjNS41LTMgMTUuNS0zIDIxIDBtLTIxIDMuNWM1LjUtMyAxNS41LTMgMjEgMG0tMjEgMy41YzUuNS0zIDE1LjUtMyAyMSAwIi8+PC9nPjwvc3ZnPg==')}
+.pc.bp{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PHBhdGggZD0iTTIyLjUgOWMtMi4yMSAwLTQgMS43OS00IDQgMCAuODkuMjkgMS43MS43OCAyLjM4QzE3LjMzIDE2LjUgMTYgMTguNTkgMTYgMjFjMCAyLjAzLjk0IDMuODQgMi40MSA1LjAzLTMgMS4wNi03LjQxIDUuNTUtNy40MSAxMy40N2gyM2MwLTcuOTItNC40MS0xMi40MS03LjQxLTEzLjQ3IDEuNDctMS4xOSAyLjQxLTMgMi40MS01LjAzIDAtMi40MS0xLjMzLTQuNS0zLjI4LTUuNjIuNDktLjY3Ljc4LTEuNDkuNzgtMi4zOCAwLTIuMjEtMS43OS00LTQtNHoiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg==')}
+.pc.bb{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxnIGZpbGw9IiMwMDAiIHN0cm9rZS1saW5lY2FwPSJidXR0Ij48cGF0aCBkPSJNOSAzNmMzLjM5LS45NyAxMC4xMS40MyAxMy41LTIgMy4zOSAyLjQzIDEwLjExIDEuMDMgMTMuNSAyIDAgMCAxLjY1LjU0IDMgMi0uNjguOTctMS42NS45OS0zIC41LTMuMzktLjk3LTEwLjExLjQ2LTEzLjUtMS0zLjM5IDEuNDYtMTAuMTEuMDMtMTMuNSAxLTEuMzU0LjQ5LTIuMzIzLjQ3LTMtLjUgMS4zNTQtMS45NCAzLTIgMy0yeiIvPjxwYXRoIGQ9Ik0xNSAzMmMyLjUgMi41IDEyLjUgMi41IDE1IDAgLjUtMS41IDAtMiAwLTIgMC0yLjUtMi41LTQtMi41LTQgNS41LTEuNSA2LTExLjUtNS0xNS41LTExIDQtMTAuNSAxNC01IDE1LjUgMCAwLTIuNSAxLjUtMi41IDQgMCAwLS41LjUgMCAyeiIvPjxwYXRoIGQ9Ik0yNSA4YTIuNSAyLjUgMCAxIDEtNSAwIDIuNSAyLjUgMCAxIDEgNSAweiIvPjwvZz48cGF0aCBkPSJNMTcuNSAyNmgxME0xNSAzMGgxNW0tNy41LTE0LjV2NU0yMCAxOGg1IiBzdHJva2U9IiNlY2VjZWMiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48L2c+PC9zdmc+')}
+.pc.bn{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxMGMxMC41IDEgMTYuNSA4IDE2IDI5SDE1YzAtOSAxMC02LjUgOC0yMSIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik0yNCAxOGMuMzggMi45MS01LjU1IDcuMzctOCA5LTMgMi0yLjgyIDQuMzQtNSA0LTEuMDQyLS45NCAxLjQxLTMuMDQgMC0zLTEgMCAuMTkgMS4yMy0xIDItMSAwLTQuMDAzIDEtNC00IDAtMiA2LTEyIDYtMTJzMS44OS0xLjkgMi0zLjVjLS43My0uOTk0LS41LTItLjUtMyAxLTEgMyAyLjUgMyAyLjVoMnMuNzgtMS45OTIgMi41LTNjMSAwIDEgMyAxIDMiIGZpbGw9IiMwMDAiLz48cGF0aCBkPSJNOS41IDI1LjVhLjUuNSAwIDEgMS0xIDAgLjUuNSAwIDEgMSAxIDB6bTUuNDMzLTkuNzVhLjUgMS41IDMwIDEgMS0uODY2LS41LjUgMS41IDMwIDEgMSAuODY2LjV6IiBmaWxsPSIjZWNlY2VjIiBzdHJva2U9IiNlY2VjZWMiLz48cGF0aCBkPSJNMjQuNTUgMTAuNGwtLjQ1IDEuNDUuNS4xNWMzLjE1IDEgNS42NSAyLjQ5IDcuOSA2Ljc1UzM1Ljc1IDI5LjA2IDM1LjI1IDM5bC0uMDUuNWgyLjI1bC4wNS0uNWMuNS0xMC4wNi0uODgtMTYuODUtMy4yNS0yMS4zNC0yLjM3LTQuNDktNS43OS02LjY0LTkuMTktNy4xNmwtLjUxLS4xeiIgZmlsbD0iI2VjZWNlYyIgc3Ryb2tlPSJub25lIi8+PC9nPjwvc3ZnPg==')}
+.pc.br{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik05IDM5aDI3di0zSDl2M3ptMy41LTdsMS41LTIuNWgxN2wxLjUgMi41aC0yMHptLS41IDR2LTRoMjF2NEgxMnoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTE0IDI5LjV2LTEzaDE3djEzSDE0eiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48cGF0aCBkPSJNMTQgMTYuNUwxMSAxNGgyM2wtMyAyLjVIMTR6TTExIDE0VjloNHYyaDVWOWg1djJoNVY5aDR2NUgxMXoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTEyIDM1LjVoMjFtLTIwLTRoMTltLTE4LTJoMTdtLTE3LTEzaDE3TTExIDE0aDIzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlY2VjZWMiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIvPjwvZz48L3N2Zz4=')}
+.pc.bq{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxnIHN0cm9rZT0ibm9uZSI+PGNpcmNsZSBjeD0iNiIgY3k9IjEyIiByPSIyLjc1Ii8+PGNpcmNsZSBjeD0iMTQiIGN5PSI5IiByPSIyLjc1Ii8+PGNpcmNsZSBjeD0iMjIuNSIgY3k9IjgiIHI9IjIuNzUiLz48Y2lyY2xlIGN4PSIzMSIgY3k9IjkiIHI9IjIuNzUiLz48Y2lyY2xlIGN4PSIzOSIgY3k9IjEyIiByPSIyLjc1Ii8+PC9nPjxwYXRoIGQ9Ik05IDI2YzguNS0xLjUgMjEtMS41IDI3IDBsMi41LTEyLjVMMzEgMjVsLS4zLTE0LjEtNS4yIDEzLjYtMy0xNC41LTMgMTQuNS01LjItMTMuNkwxNCAyNSA2LjUgMTMuNSA5IDI2eiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiLz48cGF0aCBkPSJNOSAyNmMwIDIgMS41IDIgMi41IDQgMSAxLjUgMSAxIC41IDMuNS0xLjUgMS0xLjUgMi41LTEuNSAyLjUtMS41IDEuNS41IDIuNS41IDIuNSA2LjUgMSAxNi41IDEgMjMgMCAwIDAgMS41LTEgMC0yLjUgMCAwIC41LTEuNS0xLTIuNS0uNS0yLjUtLjUtMiAuNS0zLjUgMS0yIDIuNS0yIDIuNS00LTguNS0xLjUtMTguNS0xLjUtMjcgMHoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTExIDM4LjVhMzUgMzUgMSAwIDAgMjMgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiLz48cGF0aCBkPSJNMTEgMjlhMzUgMzUgMSAwIDEgMjMgMG0tMjEuNSAyLjVoMjBtLTIxIDNhMzUgMzUgMSAwIDAgMjIgMG0tMjMgM2EzNSAzNSAxIDAgMCAyNCAwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlY2VjZWMiLz48L2c+PC9zdmc+')}
+.pc.bk{background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMi41IDExLjYzVjYiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48cGF0aCBkPSJNMjIuNSAyNXM0LjUtNy41IDMtMTAuNWMwIDAtMS0yLjUtMy0yLjVzLTMgMi41LTMgMi41Yy0xLjUgMyAzIDEwLjUgMyAxMC41IiBmaWxsPSIjMDAwIiBzdHJva2UtbGluZWNhcD0iYnV0dCIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIvPjxwYXRoIGQ9Ik0xMS41IDM3YzUuNSAzLjUgMTUuNSAzLjUgMjEgMHYtN3M5LTQuNSA2LTEwLjVjLTQtNi41LTEzLjUtMy41LTE2IDRWMjd2LTMuNWMtMy41LTcuNS0xMy0xMC41LTE2LTQtMyA2IDUgMTAgNSAxMFYzN3oiIGZpbGw9IiMwMDAiLz48cGF0aCBkPSJNMjAgOGg1IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PHBhdGggZD0iTTMyIDI5LjVzOC41LTQgNi4wMy05LjY1QzM0LjE1IDE0IDI1IDE4IDIyLjUgMjQuNWwuMDEgMi4xLS4wMS0yLjFDMjAgMTggOS45MDYgMTQgNi45OTcgMTkuODVjLTIuNDk3IDUuNjUgNC44NTMgOSA0Ljg1MyA5IiBzdHJva2U9IiNlY2VjZWMiLz48cGF0aCBkPSJNMTEuNSAzMGM1LjUtMyAxNS41LTMgMjEgMG0tMjEgMy41YzUuNS0zIDE1LjUtMyAyMSAwbS0yMSAzLjVjNS41LTMgMTUuNS0zIDIxIDAiIHN0cm9rZT0iI2VjZWNlYyIvPjwvZz48L3N2Zz4=')}
+
 /* Classificació */
 .stand{padding:0;overflow:hidden}
 .shead,.srow{display:grid;grid-template-columns:32px minmax(0,1fr) 52px 48px;gap:8px;align-items:center;padding:0 12px}
@@ -376,6 +422,10 @@ table.st td.pts{font-size:1.25rem;font-weight:800}
 <div id="layer"></div>
 
 <script>
+/* chess.js 0.10.3 · (c) 2020 Jeff Hlywa · llicència BSD-2 · https://github.com/jhlywa/chess.js */
+var Chess=function(r){var e="b",n="w",t=-1,o="p",i="n",f="b",u="r",a="q",l="k",s="pnbrqkPNBRQK",p="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",c=["1-0","0-1","1/2-1/2","*"],v={b:[16,32,17,15],w:[-16,-32,-17,-15]},g={n:[-18,-33,-31,-14,18,33,31,14],b:[-17,-15,17,15],r:[-16,1,16,-1],q:[-17,-16,-15,1,17,16,15,-1],k:[-17,-16,-15,1,17,16,15,-1]},h=[20,0,0,0,0,0,0,24,0,0,0,0,0,0,20,0,0,20,0,0,0,0,0,24,0,0,0,0,0,20,0,0,0,0,20,0,0,0,0,24,0,0,0,0,20,0,0,0,0,0,0,20,0,0,0,24,0,0,0,20,0,0,0,0,0,0,0,0,20,0,0,24,0,0,20,0,0,0,0,0,0,0,0,0,0,20,2,24,2,20,0,0,0,0,0,0,0,0,0,0,0,2,53,56,53,2,0,0,0,0,0,0,24,24,24,24,24,24,56,0,56,24,24,24,24,24,24,0,0,0,0,0,0,2,53,56,53,2,0,0,0,0,0,0,0,0,0,0,0,20,2,24,2,20,0,0,0,0,0,0,0,0,0,0,20,0,0,24,0,0,20,0,0,0,0,0,0,0,0,20,0,0,0,24,0,0,0,20,0,0,0,0,0,0,20,0,0,0,0,24,0,0,0,0,20,0,0,0,0,20,0,0,0,0,0,24,0,0,0,0,0,20,0,0,20,0,0,0,0,0,0,24,0,0,0,0,0,0,20],E=[17,0,0,0,0,0,0,16,0,0,0,0,0,0,15,0,0,17,0,0,0,0,0,16,0,0,0,0,0,15,0,0,0,0,17,0,0,0,0,16,0,0,0,0,15,0,0,0,0,0,0,17,0,0,0,16,0,0,0,15,0,0,0,0,0,0,0,0,17,0,0,16,0,0,15,0,0,0,0,0,0,0,0,0,0,17,0,16,0,15,0,0,0,0,0,0,0,0,0,0,0,0,17,16,15,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,-1,-1,-1,-1,-1,-1,-1,0,0,0,0,0,0,0,-15,-16,-17,0,0,0,0,0,0,0,0,0,0,0,0,-15,0,-16,0,-17,0,0,0,0,0,0,0,0,0,0,-15,0,0,-16,0,0,-17,0,0,0,0,0,0,0,0,-15,0,0,0,-16,0,0,0,-17,0,0,0,0,0,0,-15,0,0,0,0,-16,0,0,0,0,-17,0,0,0,0,-15,0,0,0,0,0,-16,0,0,0,0,0,-17,0,0,-15,0,0,0,0,0,0,-16,0,0,0,0,0,0,-17],d={p:0,n:1,b:2,r:3,q:4,k:5},b={NORMAL:"n",CAPTURE:"c",BIG_PAWN:"b",EP_CAPTURE:"e",PROMOTION:"p",KSIDE_CASTLE:"k",QSIDE_CASTLE:"q"},_={NORMAL:1,CAPTURE:2,BIG_PAWN:4,EP_CAPTURE:8,PROMOTION:16,KSIDE_CASTLE:32,QSIDE_CASTLE:64},A=7,S=6,m=1,y=0,C={a8:0,b8:1,c8:2,d8:3,e8:4,f8:5,g8:6,h8:7,a7:16,b7:17,c7:18,d7:19,e7:20,f7:21,g7:22,h7:23,a6:32,b6:33,c6:34,d6:35,e6:36,f6:37,g6:38,h6:39,a5:48,b5:49,c5:50,d5:51,e5:52,f5:53,g5:54,h5:55,a4:64,b4:65,c4:66,d4:67,e4:68,f4:69,g4:70,h4:71,a3:80,b3:81,c3:82,d3:83,e3:84,f3:85,g3:86,h3:87,a2:96,b2:97,c2:98,d2:99,e2:100,f2:101,g2:102,h2:103,a1:112,b1:113,c1:114,d1:115,e1:116,f1:117,g1:118,h1:119},T={w:[{square:C.a1,flag:_.QSIDE_CASTLE},{square:C.h1,flag:_.KSIDE_CASTLE}],b:[{square:C.a8,flag:_.QSIDE_CASTLE},{square:C.h8,flag:_.KSIDE_CASTLE}]},I=new Array(128),P={w:t,b:t},w=n,L={w:0,b:0},R=t,N=0,O=1,k=[],q={};function D(r){void 0===r&&(r=!1),I=new Array(128),P={w:t,b:t},w=n,L={w:0,b:0},R=t,N=0,O=1,k=[],r||(q={}),B(x())}function K(){Q(p)}function Q(r,o){void 0===o&&(o=!1);var i=r.split(/\s+/),f=i[0],u=0;if(!U(r).valid)return!1;D(o);for(var a=0;a<f.length;a++){var l=f.charAt(a);if("/"===l)u+=8;else if(-1!=="0123456789".indexOf(l))u+=parseInt(l,10);else{var s=l<"a"?n:e;M({type:l.toLowerCase(),color:s},fr(u)),u++}}return w=i[1],i[2].indexOf("K")>-1&&(L.w|=_.KSIDE_CASTLE),i[2].indexOf("Q")>-1&&(L.w|=_.QSIDE_CASTLE),i[2].indexOf("k")>-1&&(L.b|=_.KSIDE_CASTLE),i[2].indexOf("q")>-1&&(L.b|=_.QSIDE_CASTLE),R="-"===i[3]?t:C[i[3]],N=parseInt(i[4],10),O=parseInt(i[5],10),B(x()),!0}function U(r){var e="No errors.",n="FEN string must contain six space-delimited fields.",t="6th field (move number) must be a positive integer.",o="5th field (half move counter) must be a non-negative integer.",i="4th field (en-passant square) is invalid.",f="3rd field (castling availability) is invalid.",u="2nd field (side to move) is invalid.",a="1st field (piece positions) does not contain 8 '/'-delimited rows.",l="1st field (piece positions) is invalid [consecutive numbers].",s="1st field (piece positions) is invalid [invalid piece].",p="1st field (piece positions) is invalid [row too large].",c="Illegal en-passant square",v=r.split(/\s+/);if(6!==v.length)return{valid:!1,error_number:1,error:n};if(isNaN(v[5])||parseInt(v[5],10)<=0)return{valid:!1,error_number:2,error:t};if(isNaN(v[4])||parseInt(v[4],10)<0)return{valid:!1,error_number:3,error:o};if(!/^(-|[abcdefgh][36])$/.test(v[3]))return{valid:!1,error_number:4,error:i};if(!/^(KQ?k?q?|Qk?q?|kq?|q|-)$/.test(v[2]))return{valid:!1,error_number:5,error:f};if(!/^(w|b)$/.test(v[1]))return{valid:!1,error_number:6,error:u};var g=v[0].split("/");if(8!==g.length)return{valid:!1,error_number:7,error:a};for(var h=0;h<g.length;h++){for(var E=0,d=!1,b=0;b<g[h].length;b++)if(isNaN(g[h][b])){if(!/^[prnbqkPRNBQK]$/.test(g[h][b]))return{valid:!1,error_number:9,error:s};E+=1,d=!1}else{if(d)return{valid:!1,error_number:8,error:l};E+=parseInt(g[h][b],10),d=!0}if(8!==E)return{valid:!1,error_number:10,error:p}}return"3"==v[3][1]&&"w"==v[1]||"6"==v[3][1]&&"b"==v[1]?{valid:!1,error_number:11,error:c}:{valid:!0,error_number:0,error:e}}function x(){for(var r=0,o="",i=C.a8;i<=C.h1;i++){if(null==I[i])r++;else{r>0&&(o+=r,r=0);var f=I[i].color,u=I[i].type;o+=f===n?u.toUpperCase():u.toLowerCase()}i+1&136&&(r>0&&(o+=r),i!==C.h1&&(o+="/"),r=0,i+=8)}var a="";L[n]&_.KSIDE_CASTLE&&(a+="K"),L[n]&_.QSIDE_CASTLE&&(a+="Q"),L[e]&_.KSIDE_CASTLE&&(a+="k"),L[e]&_.QSIDE_CASTLE&&(a+="q"),a=a||"-";var l=R===t?"-":fr(R);return[o,w,a,l,N,O].join(" ")}function j(r){for(var e=0;e<r.length;e+=2)"string"==typeof r[e]&&"string"==typeof r[e+1]&&(q[r[e]]=r[e+1]);return q}function B(r){k.length>0||(r!==p?(q.SetUp="1",q.FEN=r):(delete q.SetUp,delete q.FEN))}function $(r){var e=I[C[r]];return e?{type:e.type,color:e.color}:null}function M(r,e){if(!("type"in r)||!("color"in r))return!1;if(-1===s.indexOf(r.type.toLowerCase()))return!1;if(!(e in C))return!1;var n=C[e];return(r.type!=l||P[r.color]==t||P[r.color]==n)&&(I[n]={type:r.type,color:r.color},r.type===l&&(P[r.color]=n),B(x()),!0)}function G(r,e,n,t,i){var f={color:w,from:e,to:n,flags:t,piece:r[e].type};return i&&(f.flags|=_.PROMOTION,f.promotion=i),r[n]?f.captured=r[n].type:t&_.EP_CAPTURE&&(f.captured=o),f}function F(r){function e(r,e,n,t,l){if(r[n].type!==o||or(t)!==y&&or(t)!==A)e.push(G(r,n,t,l));else for(var s=[a,u,f,i],p=0,c=s.length;p<c;p++)e.push(G(r,n,t,l,s[p]))}var n=[],t=w,l=ur(t),s={b:m,w:S},p=C.a8,c=C.h1,h=!1,E=void 0===r||!("legal"in r)||r.legal;if(void 0!==r&&"square"in r){if(!(r.square in C))return[];p=c=C[r.square],h=!0}for(var d=p;d<=c;d++)if(136&d)d+=7;else{var b=I[d];if(null!=b&&b.color===t)if(b.type===o){var T=d+v[t][0];if(null==I[T]){e(I,n,d,T,_.NORMAL);T=d+v[t][1];s[t]===or(d)&&null==I[T]&&e(I,n,d,T,_.BIG_PAWN)}for(N=2;N<4;N++){136&(T=d+v[t][N])||(null!=I[T]&&I[T].color===l?e(I,n,d,T,_.CAPTURE):T===R&&e(I,n,d,R,_.EP_CAPTURE))}}else for(var N=0,O=g[b.type].length;N<O;N++){var k=g[b.type][N];for(T=d;!(136&(T+=k));){if(null!=I[T]){if(I[T].color===t)break;e(I,n,d,T,_.CAPTURE);break}if(e(I,n,d,T,_.NORMAL),"n"===b.type||"k"===b.type)break}}}if(!h||c===P[t]){if(L[t]&_.KSIDE_CASTLE){var q=(D=P[t])+2;null!=I[D+1]||null!=I[q]||Z(l,P[t])||Z(l,D+1)||Z(l,q)||e(I,n,P[t],q,_.KSIDE_CASTLE)}if(L[t]&_.QSIDE_CASTLE){var D;q=(D=P[t])-2;null!=I[D-1]||null!=I[D-2]||null!=I[D-3]||Z(l,P[t])||Z(l,D-1)||Z(l,q)||e(I,n,P[t],q,_.QSIDE_CASTLE)}}if(!E)return n;var K=[];for(d=0,O=n.length;d<O;d++)er(n[d]),z(t)||K.push(n[d]),nr();return K}function W(r,e){var n="";if(r.flags&_.KSIDE_CASTLE)n="O-O";else if(r.flags&_.QSIDE_CASTLE)n="O-O-O";else{var t=function(r,e){for(var n=F({legal:!e}),t=r.from,o=r.to,i=r.piece,f=0,u=0,a=0,l=0,s=n.length;l<s;l++){var p=n[l].from,c=n[l].to;i===n[l].piece&&t!==p&&o===c&&(f++,or(t)===or(p)&&u++,ir(t)===ir(p)&&a++)}if(f>0)return u>0&&a>0?fr(t):a>0?fr(t).charAt(1):fr(t).charAt(0);return""}(r,e);r.piece!==o&&(n+=r.piece.toUpperCase()+t),r.flags&(_.CAPTURE|_.EP_CAPTURE)&&(r.piece===o&&(n+=fr(r.from)[0]),n+="x"),n+=fr(r.to),r.flags&_.PROMOTION&&(n+="="+r.promotion.toUpperCase())}return er(r),J()&&(V()?n+="#":n+="+"),nr(),n}function H(r){return r.replace(/=/,"").replace(/[+#]?[?!]*$/,"")}function Z(r,t){for(var i=C.a8;i<=C.h1;i++)if(136&i)i+=7;else if(null!=I[i]&&I[i].color===r){var f=I[i],u=i-t,a=u+119;if(h[a]&1<<d[f.type]){if(f.type===o){if(u>0){if(f.color===n)return!0}else if(f.color===e)return!0;continue}if("n"===f.type||"k"===f.type)return!0;for(var l=E[a],s=i+l,p=!1;s!==t;){if(null!=I[s]){p=!0;break}s+=l}if(!p)return!0}}return!1}function z(r){return Z(ur(r),P[r])}function J(){return z(w)}function V(){return J()&&0===F().length}function X(){return!J()&&0===F().length}function Y(){for(var r={},e=[],n=0,t=0,o=C.a8;o<=C.h1;o++)if(t=(t+1)%2,136&o)o+=7;else{var u=I[o];u&&(r[u.type]=u.type in r?r[u.type]+1:1,u.type===f&&e.push(t),n++)}if(2===n)return!0;if(3===n&&(1===r[f]||1===r[i]))return!0;if(n===r[f]+2){var a=0,l=e.length;for(o=0;o<l;o++)a+=e[o];if(0===a||a===l)return!0}return!1}function rr(){for(var r=[],e={},n=!1;;){var t=nr();if(!t)break;r.push(t)}for(;;){var o=x().split(" ").slice(0,4).join(" ");if(e[o]=o in e?e[o]+1:1,e[o]>=3&&(n=!0),!r.length)break;er(r.pop())}return n}function er(r){var n=w,i=ur(n);if(function(r){k.push({move:r,kings:{b:P.b,w:P.w},turn:w,castling:{b:L.b,w:L.w},ep_square:R,half_moves:N,move_number:O})}(r),I[r.to]=I[r.from],I[r.from]=null,r.flags&_.EP_CAPTURE&&(w===e?I[r.to-16]=null:I[r.to+16]=null),r.flags&_.PROMOTION&&(I[r.to]={type:r.promotion,color:n}),I[r.to].type===l){if(P[I[r.to].color]=r.to,r.flags&_.KSIDE_CASTLE){var f=r.to-1,u=r.to+1;I[f]=I[u],I[u]=null}else if(r.flags&_.QSIDE_CASTLE){f=r.to+1,u=r.to-2;I[f]=I[u],I[u]=null}L[n]=""}if(L[n])for(var a=0,s=T[n].length;a<s;a++)if(r.from===T[n][a].square&&L[n]&T[n][a].flag){L[n]^=T[n][a].flag;break}if(L[i])for(a=0,s=T[i].length;a<s;a++)if(r.to===T[i][a].square&&L[i]&T[i][a].flag){L[i]^=T[i][a].flag;break}R=r.flags&_.BIG_PAWN?"b"===w?r.to-16:r.to+16:t,r.piece===o||r.flags&(_.CAPTURE|_.EP_CAPTURE)?N=0:N++,w===e&&O++,w=ur(w)}function nr(){var r=k.pop();if(null==r)return null;var n=r.move;P=r.kings,w=r.turn,L=r.castling,R=r.ep_square,N=r.half_moves,O=r.move_number;var t,i,f=w,u=ur(w);if(I[n.from]=I[n.to],I[n.from].type=n.piece,I[n.to]=null,n.flags&_.CAPTURE)I[n.to]={type:n.captured,color:u};else if(n.flags&_.EP_CAPTURE){var a;a=f===e?n.to-16:n.to+16,I[a]={type:o,color:u}}n.flags&(_.KSIDE_CASTLE|_.QSIDE_CASTLE)&&(n.flags&_.KSIDE_CASTLE?(t=n.to+1,i=n.to-1):n.flags&_.QSIDE_CASTLE&&(t=n.to-2,i=n.to+1),I[t]=I[i],I[i]=null);return n}function tr(r,e){var n=H(r);if(e){var t=n.match(/([pnbrqkPNBRQK])?([a-h][1-8])x?-?([a-h][1-8])([qrbnQRBN])?/);if(t)var o=t[1],i=t[2],f=t[3],u=t[4]}for(var a=F(),l=0,s=a.length;l<s;l++){if(n===H(W(a[l]))||e&&n===H(W(a[l],!0)))return a[l];if(t&&(!o||o.toLowerCase()==a[l].piece)&&C[i]==a[l].from&&C[f]==a[l].to&&(!u||u.toLowerCase()==a[l].promotion))return a[l]}return null}function or(r){return r>>4}function ir(r){return 15&r}function fr(r){var e=ir(r),n=or(r);return"abcdefgh".substring(e,e+1)+"87654321".substring(n,n+1)}function ur(r){return r===n?e:n}function ar(r){var e=lr(r);e.san=W(e,!1),e.to=fr(e.to),e.from=fr(e.from);var n="";for(var t in _)_[t]&e.flags&&(n+=b[t]);return e.flags=n,e}function lr(r){var e=r instanceof Array?[]:{};for(var n in r)e[n]="object"==typeof n?lr(r[n]):r[n];return e}function sr(r){return r.replace(/^\s+|\s+$/g,"")}function pr(r){for(var e=F({legal:!1}),n=0,t=w,o=0,i=e.length;o<i;o++){if(er(e[o]),!z(t))if(r-1>0)n+=pr(r-1);else n++;nr()}return n}return Q(void 0===r?p:r),{WHITE:n,BLACK:e,PAWN:o,KNIGHT:i,BISHOP:f,ROOK:u,QUEEN:a,KING:l,SQUARES:function(){for(var r=[],e=C.a8;e<=C.h1;e++)136&e?e+=7:r.push(fr(e));return r}(),FLAGS:b,load:function(r){return Q(r)},reset:function(){return K()},moves:function(r){for(var e=F(r),n=[],t=0,o=e.length;t<o;t++)void 0!==r&&"verbose"in r&&r.verbose?n.push(ar(e[t])):n.push(W(e[t],!1));return n},in_check:function(){return J()},in_checkmate:function(){return V()},in_stalemate:function(){return X()},in_draw:function(){return N>=100||X()||Y()||rr()},insufficient_material:function(){return Y()},in_threefold_repetition:function(){return rr()},game_over:function(){return N>=100||V()||X()||Y()||rr()},validate_fen:function(r){return U(r)},fen:function(){return x()},board:function(){for(var r=[],e=[],n=C.a8;n<=C.h1;n++)null==I[n]?e.push(null):e.push({type:I[n].type,color:I[n].color}),n+1&136&&(r.push(e),e=[],n+=8);return r},pgn:function(r){var e="object"==typeof r&&"string"==typeof r.newline_char?r.newline_char:"\n",n="object"==typeof r&&"number"==typeof r.max_width?r.max_width:0,t=[],o=!1;for(var i in q)t.push("["+i+' "'+q[i]+'"]'+e),o=!0;o&&k.length&&t.push(e);for(var f=[];k.length>0;)f.push(nr());for(var u=[],a="";f.length>0;){var l=f.pop();k.length||"b"!==l.color?"w"===l.color&&(a.length&&u.push(a),a=O+"."):a=O+". ...",a=a+" "+W(l,!1),er(l)}if(a.length&&u.push(a),void 0!==q.Result&&u.push(q.Result),0===n)return t.join("")+u.join(" ");var s=0;for(i=0;i<u.length;i++)s+u[i].length>n&&0!==i?(" "===t[t.length-1]&&t.pop(),t.push(e),s=0):0!==i&&(t.push(" "),s++),t.push(u[i]),s+=u[i].length;return t.join("")},load_pgn:function(r,e){var n=void 0!==e&&"sloppy"in e&&e.sloppy;function t(r){return r.replace(/\\/g,"\\")}var o="object"==typeof e&&"string"==typeof e.newline_char?e.newline_char:"\r?\n",i=new RegExp("^(\\[((?:"+t(o)+")|.)*\\])(?:"+t(o)+"){2}"),f=i.test(r)?i.exec(r)[1]:"";K();var u=function(r,e){for(var n="object"==typeof e&&"string"==typeof e.newline_char?e.newline_char:"\r?\n",o={},i=r.split(new RegExp(t(n))),f="",u="",a=0;a<i.length;a++)f=i[a].replace(/^\[([A-Z][A-Za-z]*)\s.*\]$/,"$1"),u=i[a].replace(/^\[[A-Za-z]+\s"(.*)"\]$/,"$1"),sr(f).length>0&&(o[f]=u);return o}(f,e);for(var a in u)j([a,u[a]]);if(!("1"!==u.SetUp||"FEN"in u&&Q(u.FEN,!0)))return!1;var l=r.replace(f,"").replace(new RegExp(t(o),"g")," ");l=l.replace(/(\{[^}]+\})+?/g,"");for(var s=/(\([^\(\)]+\))+?/g;s.test(l);)l=l.replace(s,"");var p=sr(l=(l=(l=l.replace(/\d+\.(\.\.)?/g,"")).replace(/\.\.\./g,"")).replace(/\$\d+/g,"")).split(new RegExp(/\s+/));p=p.join(",").replace(/,,+/g,",").split(",");for(var v="",g=0;g<p.length-1;g++){if(null==(v=tr(p[g],n)))return!1;er(v)}if(v=p[p.length-1],c.indexOf(v)>-1)(function(r){for(var e in r)return!0;return!1})(q)&&void 0===q.Result&&j(["Result",v]);else{if(null==(v=tr(v,n)))return!1;er(v)}return!0},header:function(){return j(arguments)},ascii:function(){return function(){for(var r="   +------------------------+\n",e=C.a8;e<=C.h1;e++){if(0===ir(e)&&(r+=" "+"87654321"[or(e)]+" |"),null==I[e])r+=" . ";else{var t=I[e].type;r+=" "+(I[e].color===n?t.toUpperCase():t.toLowerCase())+" "}e+1&136&&(r+="|\n",e+=8)}return r+="   +------------------------+\n",r+"     a  b  c  d  e  f  g  h\n"}()},turn:function(){return w},move:function(r,e){var n=void 0!==e&&"sloppy"in e&&e.sloppy,t=null;if("string"==typeof r)t=tr(r,n);else if("object"==typeof r)for(var o=F(),i=0,f=o.length;i<f;i++)if(r.from===fr(o[i].from)&&r.to===fr(o[i].to)&&(!("promotion"in o[i])||r.promotion===o[i].promotion)){t=o[i];break}if(!t)return null;var u=ar(t);return er(t),u},undo:function(){var r=nr();return r?ar(r):null},clear:function(){return D()},put:function(r,e){return M(r,e)},get:function(r){return $(r)},remove:function(r){return function(r){var e=$(r);return I[C[r]]=null,e&&e.type===l&&(P[e.color]=t),B(x()),e}(r)},perft:function(r){return pr(r)},square_color:function(r){if(r in C){var e=C[r];return(or(e)+ir(e))%2==0?"light":"dark"}return null},history:function(r){for(var e=[],n=[],t=(void 0!==r&&"verbose"in r&&r.verbose);k.length>0;)e.push(nr());for(;e.length>0;){var o=e.pop();t?n.push(ar(o)):n.push(W(o)),er(o)}return n}}};"undefined"!=typeof exports&&(exports.Chess=Chess),"undefined"!=typeof define&&define((function(){return Chess}));
+</script>
+<script>
 /* =========================================================
    ESCACS 3 TURONS — gestor de tornejos (un sol fitxer)
    Dades: localStorage + exportar/importar JSON + dades.json publicat
@@ -467,6 +517,7 @@ async function push(){
   if(dirty || pendingOps.length) push();
 }
 async function poll(){
+  onlineLoad();
   if(!remote() || pushing || dirty || pendingOps.length || document.visibilityState!=='visible') return;
   if(document.querySelector('#layer .scrim, #layer .sheet')) return;      // hi ha un formulari obert
   const a=document.activeElement; if(a && /INPUT|TEXTAREA|SELECT/.test(a.tagName)) return;
@@ -475,6 +526,223 @@ async function poll(){
     if(r.data && r.ver>VER && !pushing && !dirty){ S=sanitize(r.data); VER=r.ver; if(admin) try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){}
       if(!$('#layer').children.length) render(); else if(window._fsRedraw) window._fsRedraw(); }
   }catch(e){ online=false; setSync('off'); }
+}
+
+/* ---------- 2d. PARTIDES ONLINE ----------
+   Partides "per correspondència": cadascú mou quan pot. Les dues persones pacten una paraula clau
+   en persona; amb ella poden moure. Qualsevol persona pot mirar la partida. */
+let ONLINE = {};                       // gid → resum {n, estat, res, taules}
+const GKEY = gid => 'escacs3t_g_' + gid;
+function gidOf(t, ri, gi){ return t.id + ':' + ri + ':' + gi; }
+function normKey(k){ return norm(String(k||'')).replace(/\s+/g,' ').trim(); }
+function myGame(gid){ try{ return JSON.parse(localStorage.getItem(GKEY(gid))||'null'); }catch(e){ return null; } }
+function setMyGame(gid, v){ try{ v ? localStorage.setItem(GKEY(gid), JSON.stringify(v)) : localStorage.removeItem(GKEY(gid)); }catch(e){} }
+async function apiGetQ(q){ const r = await fetch(api()+'?'+new URLSearchParams({...q, t:Date.now()}), {cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); }
+async function onlineLoad(){
+  if(!remote()) return;
+  try{ const r = await apiGetQ({op:'games'}); if(r.ok){ const m={}; (r.list||[]).forEach(x=>m[x.gid]=x); const ch = JSON.stringify(m)!==JSON.stringify(ONLINE); ONLINE=m; if(ch && !$('#layer').children.length) render(); } }catch(e){}
+}
+function onlineTag(gid){ const o=ONLINE[gid]; if(!o) return ''; if(o.estat==='joc') return o.taules ? 'Oferta de taules' : (o.n===0 ? 'Online · per començar' : `Online · jugada ${Math.floor(o.n/2)+1}`); return ''; }
+
+/* --- Pantalla de la partida --- */
+const GV = { gid:null, t:null, ri:0, gi:0, game:null, chess:null, sel:null, pending:null, flip:false, timer:null, busy:false, promo:null };
+const FILES='abcdefgh';
+function replay(moves){ const c=new Chess(); for(const u of moves){ if(!c.move({from:u.slice(0,2), to:u.slice(2,4), promotion:u[4]||'q'})) break; } return c; }
+function gvSide(){ const m=myGame(GV.gid); return m && m.side; }
+function gvTurn(){ return GV.chess ? GV.chess.turn() : 'w'; }
+function gvPairing(){ return GV.t && GV.t.rounds[GV.ri] && GV.t.rounds[GV.ri][GV.gi]; }
+
+function openOnline(tid, ri, gi){
+  if(!remote()) return toast('Les partides online necessiten el full de Google connectat');
+  const t=T(tid); if(!t) return;
+  Object.assign(GV, { gid:gidOf(t,ri,gi), t, ri:+ri, gi:+gi, game:null, chess:new Chess(), sel:null, pending:null, promo:null, flip:false, busy:false });
+  const m=myGame(GV.gid); GV.flip = !!(m && m.side==='b');
+  const L=$('#layer'); const d=document.createElement('div'); d.className='sheet gv'; d.id='gv'; L.appendChild(d);
+  gvRender(); gvFetch();
+  clearInterval(GV.timer); GV.timer=setInterval(()=>{ if(!document.getElementById('gv')){ clearInterval(GV.timer); return; } if(!GV.pending && !GV.busy && document.visibilityState==='visible') gvFetch(); }, 8000);
+}
+function closeOnline(){ clearInterval(GV.timer); const d=document.getElementById('gv'); if(d) d.remove(); onlineLoad(); poll(); render(); }
+async function gvFetch(){
+  try{ const r=await apiGetQ({op:'game', gid:GV.gid}); if(!r.ok) return;
+    const before = GV.game ? GV.game.moves.length+GV.game.estat+GV.game.taules : '';
+    GV.game = r.game; GV.chess = replay(r.game ? r.game.moves : []);
+    const after = GV.game ? GV.game.moves.length+GV.game.estat+GV.game.taules : '';
+    if(before!==after || !document.querySelector('#gv .board')) gvRender();
+  }catch(e){ const s=document.querySelector('#gv .gstatus'); if(s) s.textContent='Sense connexió. Es tornarà a provar sola.'; }
+}
+
+function gvStatus(){
+  const g=GV.game, c=GV.chess, p=gvPairing();
+  if(!g) return 'Aquesta partida encara no s\'ha començat online.';
+  if(g.estat==='fi') return `Partida acabada: <b>${g.res.replace('-',' – ')}</b>${g.motiu?' · '+esc(g.motiu):''}`;
+  if(GV.pending) return 'Comprova la jugada i prem <b>Enviar</b>. Si t\'has equivocat, <b>Desfer</b>.';
+  if(p && p.res) return `L'organització ja ha posat el resultat: <b>${p.res.replace('-',' – ')}</b>`;
+  const turn = c.turn()==='w' ? 'les blanques' : 'les negres', me=gvSide();
+  let s = me ? (c.turn()===me ? '<b>Et toca moure.</b>' : `Torn de ${turn}. Esperant la jugada del rival.`) : `Torn de ${turn}.`;
+  if(c.in_check()) s = '<b>Escac!</b> '+s;
+  if(g.taules) s += g.taules===me ? ' · Has ofert taules.' : ' · <b>T\'ofereixen taules.</b>';
+  return s;
+}
+function gvBoard(){
+  const c=GV.chess, last = GV.pending || (GV.game && GV.game.moves.length ? GV.game.moves[GV.game.moves.length-1] : null);
+  const me=gvSide(), live = GV.game && GV.game.estat==='joc' && !(gvPairing()||{}).res;
+  const canMove = live && me && c.turn()===me && !GV.pending;
+  const targets = (canMove && GV.sel) ? c.moves({square:GV.sel, verbose:true}) : [];
+  const tset = {}; targets.forEach(m=>tset[m.to]=m);
+  const board = c.board();   // [rang 8..1][columna a..h]
+  let kingInCheck=null; if(c.in_check()){ const tn=c.turn(); board.forEach((row,r)=>row.forEach((pc,f)=>{ if(pc&&pc.type==='k'&&pc.color===tn) kingInCheck=FILES[f]+(8-r); })); }
+  let h='';
+  for(let vr=0; vr<8; vr++) for(let vf=0; vf<8; vf++){
+    const r = GV.flip ? 7-vr : vr, f = GV.flip ? 7-vf : vf;
+    const sq = FILES[f]+(8-r), pc = board[r][f], dark=(r+f)%2===1;
+    const cls=['sq', dark?'d':'l'];
+    if(last && (last.slice(0,2)===sq || last.slice(2,4)===sq)) cls.push('last');
+    if(GV.sel===sq) cls.push('sel');
+    if(kingInCheck===sq) cls.push('chk');
+    const tg=tset[sq];
+    const coordF = vr===7 ? `<span class="cf">${FILES[f]}</span>` : '', coordR = vf===0 ? `<span class="cr">${8-r}</span>` : '';
+    h += `<button class="${cls.join(' ')}" data-sq="${sq}" aria-label="${sq}${pc?' '+pieceName(pc):''}">${coordR}${coordF}${pc?`<i class="pc ${pc.color}${pc.type}"></i>`:''}${tg?`<span class="${pc?'cap':'dot'}"></span>`:''}</button>`;
+  }
+  return `<div class="board" role="grid" aria-label="Tauler">${h}</div>`;
+}
+function sanCa(san){ return String(san).replace(/[KQRBN]/g, c=>({K:'R',Q:'D',R:'T',B:'A',N:'C'})[c]); }
+function pieceName(p){ return ({p:'peó',n:'cavall',b:'alfil',r:'torre',q:'dama',k:'rei'})[p.type]+(p.color==='w'?' blanc':' negre'); }
+function gvMoves(){
+  const g=GV.game; if(!g || !g.moves.length) return '';
+  const c=new Chess(), san=[];
+  for(const u of g.moves){ const m=c.move({from:u.slice(0,2),to:u.slice(2,4),promotion:u[4]||'q'}); if(!m) break; san.push(sanCa(m.san)); }
+  let h=''; for(let i=0;i<san.length;i+=2) h+=`<span class="mn">${i/2+1}.</span><span>${san[i]}</span><span>${san[i+1]||''}</span>`;
+  return `<details class="more" ${san.length<=24?'open':''}><summary>Jugades (${san.length})</summary><div class="mlist">${h}</div></details>`;
+}
+function gvPlayer(color){
+  const p=gvPairing(), id = color==='w' ? p.w : p.b, me=gvSide();
+  const turn = GV.game && GV.game.estat==='joc' && GV.chess.turn()===color;
+  return `<div class="gpl ${turn?'turn':''}"><i class="${color==='w'?'sqw':'sqb'}"></i><b>${esc(P(id).name)}</b>${me===color?'<span class="chip">Tu</span>':''}${turn?'<span class="tdot" title="Li toca moure"></span>':''}</div>`;
+}
+function gvJoin(){
+  const g=GV.game, p=gvPairing(), m=myGame(GV.gid);
+  if(g && g.estat!=='joc') return '';
+  if(p && p.res) return '';
+  if(m) return '';
+  const newG=!g;
+  return `<section class="card gjoin">
+    <b>${newG?'Comenceu la partida online':'Entra per jugar'}</b>
+    <p class="muted small" style="margin:4px 0 10px">${newG?'Primer, trobeu-vos en persona (al passadís, al pati…) i pacteu una <b>paraula clau</b>. Només qui la sap pot moure.':'Escriu la paraula clau que vau pactar i tria el teu color. Per mirar la partida no cal.'}</p>
+    <label class="f" for="gk">Paraula clau</label>
+    <input type="text" id="gk" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="La que vau pactar">
+    <label class="f">Jugo amb…</label>
+    <div class="two"><button class="btn out" data-gside="w"><i class="sqw"></i>${esc(P(p.w).name)}</button><button class="btn out" data-gside="b"><i class="sqb"></i>${esc(P(p.b).name)}</button></div>
+    <p class="muted small" style="margin:10px 0 0">Les jugades no tenen pressa: cadascú mou quan pot. La paraula queda guardada en aquest dispositiu.</p>
+  </section>`;
+}
+function gvActions(){
+  const g=GV.game, me=gvSide(), p=gvPairing();
+  if(!g || g.estat!=='joc' || !me || (p&&p.res)) return '';
+  if(GV.pending) return '';
+  const offerIn = g.taules && g.taules!==me, offerOut = g.taules===me;
+  return `<div class="gacts">
+    ${offerIn ? `<button class="btn ok" data-gact="accept">Acceptar taules</button><button class="btn" data-gact="decline">Rebutjar taules</button>`
+      : `<button class="btn" data-gact="offer" ${offerOut?'disabled':''}>${offerOut?'Taules ofertes':'Oferir taules'}</button>`}
+    <button class="btn" data-gact="resign">Abandonar</button>
+    <button class="btn" data-gact="leave">Sortir de la partida</button>
+  </div>`;
+}
+function gvRender(){
+  const d=document.getElementById('gv'); if(!d) return;
+  const p=gvPairing(); if(!p){ closeOnline(); return; }
+  const real=GV.t.rounds[GV.ri].filter(x=>x.b!=null), n=real.indexOf(p)+1;
+  const top = GV.flip ? 'w' : 'b', bot = GV.flip ? 'b' : 'w';
+  const pend = GV.pending ? (()=>{ const c=replay(GV.game.moves); const m=c.move({from:GV.pending.slice(0,2),to:GV.pending.slice(2,4),promotion:GV.pending[4]||'q'}); return m?sanCa(m.san):GV.pending; })() : '';
+  d.innerHTML = `<div class="pbar"><button data-gact="close" aria-label="Tanca">‹</button><h3>Taula ${n} · Ronda ${GV.ri+1}</h3><button data-gact="flip" aria-label="Gira el tauler" title="Gira el tauler">⇅</button></div>
+  <div class="gbody">
+    ${gvPlayer(top)}
+    <div class="bwrap">${gvBoard()}
+      ${GV.promo?`<div class="promo"><span>Corona a:</span>${['q','r','b','n'].map(x=>`<button data-promo="${x}" aria-label="${({q:'dama',r:'torre',b:'alfil',n:'cavall'})[x]}"><i class="pc ${gvSide()}${x}"></i></button>`).join('')}</div>`:''}
+    </div>
+    ${gvPlayer(bot)}
+    <p class="gstatus">${gvStatus()}</p>
+    ${GV.pending?`<div class="gconfirm"><span>Jugada: <b>${esc(pend)}</b></span><button class="btn" data-gact="undo">Desfer</button><button class="btn pri" data-gact="send">Enviar</button></div>`:''}
+    ${gvJoin()}${gvActions()}${gvMoves()}
+  </div>`;
+}
+function gvSelect(sq){
+  const c=GV.chess, me=gvSide(); const g=GV.game;
+  if(!g || g.estat!=='joc' || !me || c.turn()!==me || GV.pending || (gvPairing()||{}).res) return;
+  const pc=c.get(sq);
+  if(GV.sel){
+    const mv=c.moves({square:GV.sel, verbose:true}).find(m=>m.to===sq);
+    if(mv){
+      if(mv.flags.includes('p')){ GV.promo={from:GV.sel,to:sq}; GV.sel=null; gvRender(); return; }
+      GV.pending = GV.sel+sq; GV.sel=null; gvPreview(); return;
+    }
+  }
+  GV.sel = (pc && pc.color===me && GV.sel!==sq) ? sq : null; gvRender();
+}
+function gvPreview(){ const u=GV.pending; GV.chess.move({from:u.slice(0,2),to:u.slice(2,4),promotion:u[4]||'q'}); gvRender(); }
+async function gvSend(){
+  if(GV.busy) return; GV.busy=true;
+  const me=gvSide(), m=myGame(GV.gid), c=GV.chess;
+  let end=null;
+  if(c.in_checkmate()) end={res: me==='w'?'1-0':'0-1', motiu:'escac i mat'};
+  else if(c.in_stalemate()) end={res:'½-½', motiu:'ofegat'};
+  else if(c.insufficient_material()) end={res:'½-½', motiu:'material insuficient'};
+  else if(c.in_threefold_repetition()) end={res:'½-½', motiu:'triple repetició'};
+  else if(c.in_draw()) end={res:'½-½', motiu:'regla dels 50 moviments'};
+  try{
+    const r=await apiPost({action:'gameMove', gid:GV.gid, key:m.key, side:me, ply:GV.game.moves.length, uci:GV.pending, end});
+    GV.pending=null;
+    if(r.ok){ GV.game=r.game; GV.chess=replay(r.game.moves); if(end) toast('Partida acabada: '+end.res); else toast('Jugada enviada'); }
+    else if(r.error==='torn'){ if(r.game){ GV.game=r.game; GV.chess=replay(r.game.moves); } toast('La partida havia canviat. S\'ha actualitzat.'); }
+    else if(r.error==='clau'){ setMyGame(GV.gid,null); toast('La paraula clau no és correcta'); await gvFetch(); }
+    else { toast('No s\'ha pogut enviar'); await gvFetch(); }
+  }catch(e){ toast('Sense connexió: la jugada no s\'ha enviat'); GV.chess=replay(GV.game.moves); GV.pending=null; }
+  GV.busy=false; gvRender(); if(end) poll();
+}
+async function gvJoinSide(side){
+  const key=normKey(($('#gk')||{}).value);
+  if(key.length<3) return toast('La paraula clau ha de tenir 3 lletres o més');
+  const p=gvPairing();
+  try{
+    if(!GV.game){
+      const r=await apiPost({action:'gameCreate', gid:GV.gid, key, w:P(p.w).name, b:P(p.b).name});
+      if(!r.ok && r.error!=='existeix') return toast(r.error==='aparellament'?'Aquesta partida ja no es pot jugar online':'No s\'ha pogut començar');
+      if(r.ok){ GV.game=r.game; GV.chess=replay(r.game.moves); }
+      else await gvFetch();
+    }
+    const ck=await apiPost({action:'gameCheck', gid:GV.gid, key});
+    if(!ck.ok && ck.error==='clau') return toast('La paraula clau no és correcta');
+    if(ck.ok){ GV.game=ck.game; GV.chess=replay(ck.game.moves); }
+    setMyGame(GV.gid,{key, side}); GV.flip = side==='b'; gvRender(); toast('Ja hi ets. '+(GV.chess.turn()===side?'Et toca moure.':'Esperant el rival.'));
+  }catch(e){ toast('Sense connexió'); }
+}
+async function gvDraw(op){
+  const me=gvSide(), m=myGame(GV.gid);
+  try{ const r=await apiPost({action:'gameDraw', gid:GV.gid, key:m.key, side:me, op}); if(r.ok){ GV.game=r.game; GV.chess=replay(r.game.moves); toast(op==='offer'?'Taules ofertes':op==='accept'?'Partida acabada en taules':'Oferta rebutjada'); if(op==='accept') poll(); } else toast('No s\'ha pogut fer'); }
+  catch(e){ toast('Sense connexió'); }
+  gvRender();
+}
+document.addEventListener('click', e=>{
+  const root=e.target.closest('#gv'); if(!root) return;
+  const sqb=e.target.closest('[data-sq]'); if(sqb){ gvSelect(sqb.dataset.sq); return; }
+  const pr=e.target.closest('[data-promo]'); if(pr && GV.promo){ GV.pending=GV.promo.from+GV.promo.to+pr.dataset.promo; GV.promo=null; gvPreview(); return; }
+  const sd=e.target.closest('[data-gside]'); if(sd){ gvJoinSide(sd.dataset.gside); return; }
+  const a=e.target.closest('[data-gact]'); if(!a || a.disabled) return;
+  const act=a.dataset.gact;
+  if(act==='close') return closeOnline();
+  if(act==='flip'){ GV.flip=!GV.flip; return gvRender(); }
+  if(act==='undo'){ GV.pending=null; GV.chess=replay(GV.game.moves); return gvRender(); }
+  if(act==='send') return gvSend();
+  if(act==='offer'||act==='accept'||act==='decline') return gvDraw(act);
+  if(act==='leave'){ setMyGame(GV.gid,null); GV.flip=false; toast('Ara només mires la partida. Hi pots tornar amb la paraula clau.'); return gvRender(); }
+  if(act==='resign'){ const me=gvSide(), m=myGame(GV.gid);
+    slideConfirm('Abandonar la partida', 'Perdràs aquesta partida i el resultat es posarà a la ronda.', 'Llisca per abandonar', async()=>{
+      try{ const r=await apiPost({action:'gameResign', gid:GV.gid, key:m.key, side:me}); if(r.ok){ GV.game=r.game; toast('Has abandonat la partida'); poll(); } }catch(err){ toast('Sense connexió'); }
+      gvRender(); }); }
+});
+async function onlineReset(gid){
+  slideConfirm('Reiniciar la partida online', 'S\'esborraran les jugades i la paraula clau. Els jugadors l\'hauran de tornar a començar.', 'Llisca per reiniciar', async()=>{
+    try{ const r=await apiPost({action:'gameReset', pin:getPin(), gid}); if(r.ok){ delete ONLINE[gid]; toast('Partida online reiniciada'); render(); } else toast('No s\'ha pogut reiniciar'); }catch(e){ toast('Sense connexió'); }
+  });
 }
 
 /* ---------- 2c. SOL·LICITUDS D'INSCRIPCIÓ ----------
@@ -890,17 +1158,23 @@ function vRounds(t){
     if(g.b==null) return '';
     n++;
     const wW=g.res==='1-0', bW=g.res==='0-1', open = !lock && ui.openG===gi;
-    const tag = lock ? 'div' : 'button';
+    const gid=gidOf(t,ri,gi), onl=ONLINE[gid], canOnline = remote() && t.status==='enjoc' && !g.res;
+    const pubBtn = lock && (canOnline || onl);
+    const tag = (lock && !pubBtn) ? 'div' : 'button';
+    const attrs = !lock ? `data-act="openGame" data-g="${gi}" aria-expanded="${open}" aria-label="Taula ${n}: posar el resultat"`
+      : pubBtn ? `data-act="online" data-tid="${t.id}" data-ri="${ri}" data-gi="${gi}" aria-label="Taula ${n}: ${onl?'veure la partida online':'jugar online'}"` : '';
+    const pillTxt = g.res ? g.res.replace('-',' – ') : (onl && onl.estat==='joc' ? 'Online' : 'Pendent');
     return `<div class="pair ${open?'open':''}">
-      <${tag} class="prow3" ${lock?'':`data-act="openGame" data-g="${gi}" aria-expanded="${open}" aria-label="Taula ${n}: posar el resultat"`}>
+      <${tag} class="prow3" ${attrs}>
         <span class="n">${n}</span>
         <span class="side"><i class="sqw"></i><span class="pn ${bW?'lose':''}">${esc(P(g.w).name)}</span></span>
-        <span class="rp ${g.res?'':'pend'}">${g.res?g.res.replace('-',' – '):'Pendent'}</span>
+        <span class="rp ${g.res?'':(onl&&onl.estat==='joc'?'onl':'pend')}">${pillTxt}</span>
         <span class="side b"><span class="pn ${wW?'lose':''}">${esc(P(g.b).name)}</span><i class="sqb"></i></span>
       </${tag}>
       ${open?`<div class="rset"><div class="muted small">Tria el resultat de la taula ${n}</div>
         <div class="res3">${['1-0','½-½','0-1'].map(v=>`<button class="${g.res===v?'on':''}" data-act="res" data-g="${gi}" data-v="${v}">${v.replace('-',' – ')}</button>`).join('')}</div>
-        ${g.res?`<button class="lnk" data-act="res" data-g="${gi}" data-v="${g.res}">Esborra el resultat</button>`:''}</div>`:''}
+        ${g.res?`<button class="lnk" data-act="res" data-g="${gi}" data-v="${g.res}">Esborra el resultat</button>`:''}
+        ${(canOnline||onl)?`<div class="row"><button class="btn sm" data-act="online" data-tid="${t.id}" data-ri="${ri}" data-gi="${gi}">${IC.rounds}${onl?'Veure la partida online':'Jugar online'}</button>${onl?`<button class="btn sm" data-act="onlineReset" data-gid="${gid}">Reiniciar online</button>`:''}</div>`:''}</div>`:''}
     </div>`;
   }).join('');
   const byes = r.filter(g=>g.b==null).map(g=>`<p class="byeline">Descansa: <b>${esc(P(g.w).name)}</b> ${BYE_PTS(t)?'(+1 punt)':'(0 punts)'}</p>`).join('');
@@ -911,7 +1185,8 @@ function vRounds(t){
     <div class="spread rinfo"><span><b>${done} de ${real.length}</b> resultats · ronda ${ri+1}</span>
       <span class="legend"><span><i class="sqw"></i>Blanques</span><span><i class="sqb"></i>Negres</span></span></div>
     <div class="pairs">${rows}</div>${byes}
-    ${!lock && real.some(g=>!g.res) && ui.openG==null ? `<p class="byeline">Toca una partida per posar-hi el resultat.</p>`:''}${next}`;
+    ${!lock && real.some(g=>!g.res) && ui.openG==null ? `<p class="byeline">Toca una partida per posar-hi el resultat o jugar-la online.</p>`:''}
+    ${lock && remote() && t.status==='enjoc' && real.some(g=>!g.res) ? `<p class="byeline">Toca una partida pendent per <b>jugar-la online</b> o mirar-la. Abans, pacteu una paraula clau en persona.</p>`:''}${next}`;
 }
 
 function formChips(t, id){
@@ -1283,10 +1558,12 @@ function openMenu(){
     page('Com funciona', `<div class="pbody">
       <p><b>Suís:</b> cada ronda s'aparella gent amb punts semblants i sense repetir rival. Va bé per a grups grans (alumnat). Amb n participants, ⌈log₂ n⌉ + 1 o 2 rondes ja deixen clara la primera posició.</p>
       <p><b>Lliga:</b> tothom contra tothom. Les rondes es generen totes de cop. Si són senars, cada ronda descansa algú (0 punts, i tothom descansa una vegada).</p>
+      <p><b>Partides online:</b> toca una partida pendent a <b>Rondes</b>. Les dues persones pacten en persona una paraula clau; amb ella poden moure des de qualsevol dispositiu, sense pressa. Qualsevol persona pot mirar la partida. Quan s'acaba, el resultat es posa sol.</p>
       <p><b>Desempats:</b> Buchholz al suís (suma de punts dels rivals) i Sonneborn-Berger a la lliga.</p>
       <p><b>Colors:</b> el programa alterna blanques ♔ i negres ♚ per equilibrar.</p>
       ${remote()?'<p><b>Dades:</b> es guarden en un full de Google. Qui té el PIN pot posar resultats des de qualsevol dispositiu, i la resta ho veu en directe.</p>':''}
       <p style="${remote()?'display:none':''}"><b>Dades:</b> la vista pública mostra sempre la darrera versió publicada (<b>dades.json</b>). El mode organització treballa amb una còpia al navegador d'aquest dispositiu: fes còpies i publica <b>dades.json</b> perquè la resta ho vegi.</p>
+      <p class="muted">Peces d'escacs: Colin M. L. Burnett (BSD). Regles: chess.js (BSD).</p>
       <p class="muted">Institut Els 3 Turons · Arenys de Mar</p></div>`);
   }
 }
@@ -1359,6 +1636,8 @@ const A = {
     l.forEach(r=>{ const {p}=acceptReq(r); reqResolve(r.id,'acceptada',p.id); }); save(); render(); toast(l.length+' sol·licituds acceptades'); },
   backup:()=>download(backupName(), S),
   install:()=>installApp(),
+  online:d=>openOnline(d.tid, d.ri, d.gi),
+  onlineReset:d=>onlineReset(d.gid),
   instOff:()=>{ try{ localStorage.setItem(INST_KEY,'1'); }catch(e){} render(); toast('La pots instal·lar quan vulguis des del menú ⋮'); },
   open:d=>{ ui.view='tour'; ui.tid=d.id; ui.sub=null; ui.openG=null; const t=T(d.id); const c=t.rounds.findIndex(r=>!roundDone(r)); ui.round = c<0 ? Math.max(0,t.rounds.length-1) : c; scrollTo(0,0); render(); },
   sub:d=>{ ui.sub=d.v; render(); },
@@ -1409,7 +1688,7 @@ const A = {
   reqNo:d=>{ reqResolve(d.id,'rebutjada'); render(); toast('Rebutjada. La pots recuperar més avall.'); },
   reqUndo:d=>{ reqResolve(d.id,'pendent'); render(); },
 };
-const PUBLIC_ACTS = new Set(['go','nav','open','sub','round','menu','project','signup','stm','install','instOff']);
+const PUBLIC_ACTS = new Set(['go','nav','open','sub','round','menu','project','signup','stm','install','instOff','online']);
 const TID_ACTS = new Set(['start','nextRound','finish','kiosk','project']);
 document.addEventListener('click',e=>{ const el=e.target.closest('[data-act]'); if(!el || el.disabled) return; if(!admin && !PUBLIC_ACTS.has(el.dataset.act)) return; const f=A[el.dataset.act]; if(f){ e.preventDefault(); const d={...el.dataset}; if(d.tid && TID_ACTS.has(el.dataset.act) && T(d.tid)) ui.tid=d.tid; curAct={act:el.dataset.act, d}; try{ f(d, el, e); } finally { curAct=null; } } });
 document.addEventListener('change',e=>{ if(e.target.id==='pinShow'){ const i=document.getElementById('pin1'); if(i) i.type=e.target.checked?'text':'password'; } });
@@ -1448,6 +1727,7 @@ if('serviceWorker' in navigator && (location.protocol==='https:' || location.hos
   else     { S = await fetchPub() || sanitizeSafe(raw) || seed(); }   // el públic veu sempre la versió publicada
   applyPrefs(); render();
   if(admin) reqLoad();
+  onlineLoad();
 })();
 </script>
 </body>
