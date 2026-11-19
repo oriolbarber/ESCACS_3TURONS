@@ -882,7 +882,8 @@ function standings(t){
     if(g.b==null){ if(g.res==='bye' && R[g.w]) R[g.w].pts += BYE_PTS(t); return; }
     if(!g.res) return;
     const [a,b] = g.res==='1-0'?[1,0]:g.res==='0-1'?[0,1]:[.5,.5];
-    R[g.w].pts+=a; R[g.b].pts+=b; R[g.w].played++; R[g.b].played++;
+    const PW=t.win||1, PD=t.win?(t.draw??1):.5, pp=x=>x===1?PW:x===0?0:PD;   // puntuació del torneig (per defecte 1-½-0)
+    R[g.w].pts+=pp(a); R[g.b].pts+=pp(b); R[g.w].played++; R[g.b].played++;
     if(a===1)R[g.w].wins++; if(b===1)R[g.b].wins++;
     R[g.w].games.push([g.b,a]); R[g.b].games.push([g.w,b]);
   }));
@@ -1364,6 +1365,8 @@ function tourModal(t){
     <label class="f">Format</label>
     <div class="seg" id="mFmt">${[['suis','Suís'],['lliga','Lliga']].map(([k,l])=>`<button class="${t.format===k?'on':''}" data-v="${k}" ${started?'disabled':''}>${l}</button>`).join('')}</div>
     <p class="muted" id="mFmtTxt" style="font-size:.88rem;margin:.6em 0 0"></p>
+    <label class="f">Puntuació</label>
+    <div class="seg" id="mPts">${[['1','Escacs: 1 · ½ · 0'],['3','Lliga: 3 · 1 · 0']].map(([k,l])=>`<button class="${(t.win===3?'3':'1')===k?'on':''}" data-v="${k}">${l}</button>`).join('')}</div>
     <div id="mRoundsBox"><label class="f">Nombre de rondes</label><input type="number" id="mRounds" min="1" max="15" value="${t.nRounds||5}"></div>
     ${isNew?`<label class="f" style="display:flex;gap:10px;align-items:center;font-weight:400"><input type="checkbox" id="mProfs" style="width:24px;height:24px"> Inscriure-hi tot el professorat</label>`:''}
     <div class="acts">
@@ -1371,7 +1374,8 @@ function tourModal(t){
       ${!isNew&&started?`<button class="btn" data-reset>Tornar a inscripció</button>`:''}
       <button class="btn" data-x>Cancel·lar</button><button class="btn pri" data-ok>${isNew?'Crear':'Desar'}</button></div>`,
   d=>{
-    let fmtv=t.format;
+    let fmtv=t.format, ptsv=t.win===3?'3':'1';
+    d.querySelectorAll('#mPts button').forEach(b=>b.onclick=()=>{ ptsv=b.dataset.v; d.querySelectorAll('#mPts button').forEach(x=>x.classList.toggle('on',x===b)); });
     const upd=()=>{ d.querySelector('#mFmtTxt').textContent = fmtv==='suis'
         ? 'Ideal per a molts participants: cada ronda s\'aparella gent amb punts semblants, sense repetir rival.'
         : 'Tothom juga contra tothom. Recomanat fins a ~12 participants (amb 10 són 9 rondes).';
@@ -1384,10 +1388,12 @@ function tourModal(t){
       const nr = Math.max(1,Math.min(15, parseInt(d.querySelector('#mRounds').value)||5));
       if(isNew){
         const nt={id:uid(), name, format:fmtv, nRounds:fmtv==='suis'?nr:0, status:'inscripcio', playerIds:[], out:[], rounds:[], date:today()};
+        if(ptsv==='3'){ nt.win=3; nt.draw=1; }
         if(d.querySelector('#mProfs').checked) nt.playerIds = S.players.filter(p=>p.type==='prof').map(p=>p.id);
         S.tournaments.unshift(nt); ui.view='tour'; ui.tid=nt.id; ui.sub='jug'; toast('Torneig creat');
       } else {
         t.name=name; if(!started) t.format=fmtv;
+        if(ptsv==='3'){ t.win=3; t.draw=1; } else { delete t.win; delete t.draw; }
         if(t.format==='suis'){ if(nr<t.rounds.length){ toast(`Ja s'han jugat ${t.rounds.length} rondes`); return; } t.nRounds=nr; }
         toast('Desat');
       }
